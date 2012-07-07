@@ -1,4 +1,4 @@
-package husacct.validate.presentation.languageSeverityConfiguration;
+package husacct.validate.presentation.languageSeverityConfiguration.dto;
 
 import husacct.validate.domain.validation.Severity;
 import husacct.validate.domain.validation.ruletype.RuleType;

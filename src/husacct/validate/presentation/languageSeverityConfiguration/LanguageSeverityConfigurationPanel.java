@@ -2,6 +2,8 @@ package husacct.validate.presentation.languageSeverityConfiguration;
 
 import husacct.ServiceProvider;
 import husacct.validate.domain.validation.Severity;
+import husacct.validate.presentation.languageSeverityConfiguration.dto.ConfigurationRuleTypeDTO;
+import husacct.validate.presentation.languageSeverityConfiguration.dto.ConfigurationViolationTypeDTO;
 import husacct.validate.task.TaskServiceImpl;
 
 import java.util.List;

@@ -4,6 +4,7 @@ import husacct.ServiceProvider;
 import husacct.validate.domain.validation.Severity;
 import husacct.validate.domain.validation.ruletype.RuleType;
 import husacct.validate.presentation.DataLanguageHelper;
+import husacct.validate.presentation.languageSeverityConfiguration.dto.ConfigurationRuleTypeDTO;
 import husacct.validate.presentation.tableModels.ComboBoxTableModel;
 import husacct.validate.task.TaskServiceImpl;
 import java.awt.event.ActionEvent;
