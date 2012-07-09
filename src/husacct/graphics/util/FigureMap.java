@@ -26,7 +26,6 @@ public class FigureMap {
 
 	public void clearAll() {
 		maxDependencies = 0;
-		maxViolations = 0;
 		maxAll = 0;
 		moduleFigureDTOMap.clear();
 		dependencyLineDTOMap.clear();
@@ -35,6 +34,7 @@ public class FigureMap {
 	}
 
 	public void clearAllViolations() {
+		maxViolations = 0;
 		violationLineDTOMap.clear();
 		violatedFigureDTOMap.clear();
 	}

@@ -6,7 +6,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ 
 	GraphicsServiceTest.class,
-	DrawingControllerTest.class
+	DrawingControllerTest.class,
+	FigureMapTest.class
 })
 public class GraphicsTestSuite {
 
