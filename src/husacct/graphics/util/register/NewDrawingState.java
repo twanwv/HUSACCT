@@ -21,6 +21,10 @@ public class NewDrawingState {
 		parentState = state;
 	}
 	
+	public NewDrawingState getParentState(){
+		return parentState;
+	}
+	
 	public String getPath(){
 		return fullPath;
 	}

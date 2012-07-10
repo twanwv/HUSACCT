@@ -23,25 +23,25 @@ public class DrawingRegisterTest {
 	public void setup() {
 		register = new DrawingRegister();
 	}
-	
+
 	@After
 	public void cleanup() {
 		register.clear();
 	}
-	
-	private void createRootState(){
+
+	private void createRootState() {
 		rootPath = "";
 		rootState = new NewDrawingState(rootPath);
 		register.addState(rootState);
 	}
-	
-	private void createDomainState(){
+
+	private void createDomainState() {
 		domainPath = "domain";
 		domainState = new NewDrawingState(domainPath);
 		register.addState(domainState);
 	}
-	
-	private void createDomainBlogState(){
+
+	private void createDomainBlogState() {
 		domainBlogPath = "domain.blog";
 		domainBlogState = new NewDrawingState(domainBlogPath);
 		register.addState(domainBlogState);
@@ -60,6 +60,17 @@ public class DrawingRegisterTest {
 		createDomainBlogState();
 		assertTrue(register.contains(domainState));
 		assertTrue(register.contains(domainBlogState));
+	}
+
+	@Test
+	public void reopenStateAlreadyCreated() {
+		createRootState();
+		createDomainState();
+		createDomainBlogState();
+		createDomainState(); // Zoom out
+		assertTrue(register.contains(domainState));
+		assertEquals(register.getCurrentState(), domainState);
+		assertEquals(register.getCurrentState().getParentState(), rootState);
 	}
 
 	@Test
@@ -87,7 +98,7 @@ public class DrawingRegisterTest {
 		AbstractDTO contextDTO = new AnalysedModuleDTO("domain", "domain", "package", "direct");
 		NewDrawingState rootState = register.getState(rootPath);
 		rootState.addFigure("domain", contextFigure, contextDTO);
-		
+
 		NewDrawingState state = register.getCurrentState();
 		state.addContextFigure(contextFigure);
 

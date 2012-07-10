@@ -9,25 +9,29 @@ public class DrawingRegister {
 	public DrawingRegister() {
 		states = new HashMap<String, NewDrawingState>();
 	}
-	
-	public void clear(){
+
+	public void clear() {
 		states.clear();
 		currentState = null;
 		previousState = null;
 	}
-	
-	public NewDrawingState getCurrentState(){
+
+	public NewDrawingState getCurrentState() {
 		return currentState;
 	}
 
 	public void addState(NewDrawingState state) {
-		states.put(state.getPath(), state);
-		
-		previousState = currentState;
+		if (contains(state)) {
+			NewDrawingState parentState = getState(state.getPath()).getParentState();
+			previousState = parentState;
+		} else {
+			previousState = currentState;
+		}
 		currentState = state;
-		if(null!=previousState){
+		if (null != previousState) {
 			state.setParentState(previousState);
 		}
+		states.put(state.getPath(), state);
 	}
 
 	public NewDrawingState getState(String path) {
@@ -35,6 +39,6 @@ public class DrawingRegister {
 	}
 
 	public boolean contains(NewDrawingState state) {
-		return states.containsValue(state);
+		return states.containsKey(state.getPath());
 	}
 }
