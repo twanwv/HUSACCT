@@ -10,47 +10,70 @@ import husacct.graphics.presentation.figures.ModuleFigure;
 import husacct.graphics.util.register.DrawingRegister;
 import husacct.graphics.util.register.NewDrawingState;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class DrawingRegisterTest {
 	private DrawingRegister register;
-	private NewDrawingState rootState, domainState;
-	private String rootPath, domainPath;
+	private NewDrawingState rootState, domainState, domainBlogState;
+	private String rootPath, domainPath, domainBlogPath;
 
 	@Before
 	public void setup() {
-
 		register = new DrawingRegister();
-
+	}
+	
+	@After
+	public void cleanup() {
+		register.clear();
+	}
+	
+	private void createRootState(){
 		rootPath = "";
 		rootState = new NewDrawingState(rootPath);
 		register.addState(rootState);
-
+	}
+	
+	private void createDomainState(){
 		domainPath = "domain";
 		domainState = new NewDrawingState(domainPath);
 		register.addState(domainState);
 	}
+	
+	private void createDomainBlogState(){
+		domainBlogPath = "domain.blog";
+		domainBlogState = new NewDrawingState(domainBlogPath);
+		register.addState(domainBlogState);
+	}
 
 	@Test
 	public void addRootState() {
+		createRootState();
 		assertTrue(register.contains(rootState));
 	}
 
 	@Test
-	public void addSecondState() {
+	public void addMoreStates() {
+		createRootState();
+		createDomainState();
+		createDomainBlogState();
 		assertTrue(register.contains(domainState));
+		assertTrue(register.contains(domainBlogState));
 	}
 
 	@Test
 	public void getState() {
-		NewDrawingState state = register.getState(rootPath);
+		createRootState();
+		NewDrawingState state = register.getCurrentState();
+		assertNotNull(state);
 		assertEquals(state, rootState);
 	}
 
 	@Test
 	public void addFigure() {
-		NewDrawingState state = register.getState(rootPath);
+		createRootState();
+		NewDrawingState state = register.getCurrentState();
 		BaseFigure figure = new ModuleFigure("name", "type");
 		state.addFigure("domain", figure, new AbstractDTO());
 		assertNotNull(state.getFigureDTO(figure));
@@ -58,14 +81,18 @@ public class DrawingRegisterTest {
 
 	@Test
 	public void addContext() {
+		createRootState();
+		createDomainState();
 		BaseFigure contextFigure = new ModuleFigure("name", "type");
 		AbstractDTO contextDTO = new AnalysedModuleDTO("domain", "domain", "package", "direct");
 		NewDrawingState rootState = register.getState(rootPath);
 		rootState.addFigure("domain", contextFigure, contextDTO);
 		
-		domainState.addContextFigure(contextFigure);
+		NewDrawingState state = register.getCurrentState();
+		state.addContextFigure(contextFigure);
 
 		assertNotNull(domainState.getFigureDTO(contextFigure));
+		assertEquals(contextDTO, domainState.getFigureDTO(contextFigure));
 	}
 
 	@Test
