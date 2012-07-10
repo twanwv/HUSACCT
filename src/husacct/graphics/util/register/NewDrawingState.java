@@ -1,17 +1,24 @@
 package husacct.graphics.util.register;
 
 import husacct.common.dto.AbstractDTO;
+import husacct.common.dto.AnalysedModuleDTO;
+import husacct.common.dto.ModuleDTO;
 import husacct.graphics.presentation.figures.BaseFigure;
 
 import java.util.HashMap;
 
 public class NewDrawingState {
+	private NewDrawingState parentState;
 	private String fullPath;
 	private HashMap<String, NewFigureMap> paths;
 	
 	public NewDrawingState(String path){
 		fullPath = path;
 		paths = new HashMap<String, NewFigureMap>();
+	}
+	
+	public void setParentState(NewDrawingState state){
+		parentState = state;
 	}
 	
 	public String getPath(){
@@ -53,11 +60,19 @@ public class NewDrawingState {
 		}
 		return path;
 	}
-	
-	public void addContextFigure(String originalPath, BaseFigure figure, AbstractDTO dto){
-		addPath(originalPath);
-		NewFigureMap map = getPath(originalPath);
-		map.addFigure(figure, dto);
-	}
 
+	public void addContextFigure(BaseFigure contextFigure) {
+		if (null != parentState) {
+			AbstractDTO contextDTO = parentState.getFigureDTO(contextFigure);
+			String path = null;
+			if(contextDTO instanceof ModuleDTO){
+				path = ((ModuleDTO) contextDTO).logicalPath;
+			}else if (contextDTO instanceof AnalysedModuleDTO){
+				path = ((AnalysedModuleDTO) contextDTO).uniqueName;
+			}else{
+				throw new RuntimeException("DTO type not supported");
+			}
+			addFigure(path, contextFigure, contextDTO);
+		}
+	}
 }

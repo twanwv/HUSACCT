@@ -40,7 +40,6 @@ public class DrawingRegisterTest {
 	@Test
 	public void addSecondState() {
 		assertTrue(register.contains(domainState));
-		assertEquals(domainState, register.getCurrentState());
 	}
 
 	@Test
@@ -64,7 +63,7 @@ public class DrawingRegisterTest {
 		NewDrawingState rootState = register.getState(rootPath);
 		rootState.addFigure("domain", contextFigure, contextDTO);
 		
-		register.addContextFigure(contextFigure);
+		domainState.addContextFigure(contextFigure);
 
 		assertNotNull(domainState.getFigureDTO(contextFigure));
 	}
