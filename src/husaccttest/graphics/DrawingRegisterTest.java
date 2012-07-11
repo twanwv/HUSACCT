@@ -74,8 +74,18 @@ public class DrawingRegisterTest {
 	public void reopenStateAlreadyCreated() {
 		createRootState();
 		createDomainState();
+		
+		NewDrawingState state = register.getCurrentState();
+		BaseFigure figure = new ModuleFigure("name", "type");
+		AbstractDTO dto = new AbstractDTO();
+		state.addFigure("domain", figure, dto);
+		
 		createDomainBlogState();
 		createDomainState(); // Zoom out
+		
+		state = register.getCurrentState();
+		assertEquals(0, state.getFiguresByPath("domain").size());
+		
 		assertTrue(register.contains(domainState));
 		assertEquals(register.getCurrentState(), domainState);
 		assertEquals(register.getCurrentState().getParentState(), rootState);

@@ -18,39 +18,39 @@ public class NewDrawingState {
 	private HashMap<RelationFigure, DependencyDTO[]> dependencyDTOMap;
 	private HashMap<RelationFigure, ViolationDTO[]> violationDTOMap;
 	private HashMap<BaseFigure, Double> figurePositions;
-	
+
 	private int maxDependencies, maxViolations, maxAll;
-	
-	public NewDrawingState(String path){
+
+	public NewDrawingState(String path) {
 		fullPath = path;
 		paths = new HashMap<String, NewFigureMap>();
-		dependencyDTOMap = new HashMap<RelationFigure, DependencyDTO[]>(); 
+		dependencyDTOMap = new HashMap<RelationFigure, DependencyDTO[]>();
 		violationDTOMap = new HashMap<RelationFigure, ViolationDTO[]>();
 	}
-	
-	public void setParentState(NewDrawingState state){
+
+	public void setParentState(NewDrawingState state) {
 		parentState = state;
 	}
-	
-	public NewDrawingState getParentState(){
+
+	public NewDrawingState getParentState() {
 		return parentState;
 	}
-	
-	public String getFullPath(){
+
+	public String getFullPath() {
 		return fullPath;
 	}
-	
+
 	public ArrayList<String> getPaths() {
 		return new ArrayList<String>(paths.keySet());
 	}
-	
+
 	private void addPath(String path) {
 		if (!paths.containsKey(path)) {
 			paths.put(path, new NewFigureMap());
 		}
 	}
-	
-	private NewFigureMap getPath(String path){
+
+	private NewFigureMap getPath(String path) {
 		return paths.get(path);
 	}
 
@@ -59,21 +59,21 @@ public class NewDrawingState {
 		NewFigureMap map = getPath(subPath);
 		map.addFigure(figure, dto);
 	}
-	
-	public AbstractDTO getFigureDTO(BaseFigure figure){
+
+	public AbstractDTO getFigureDTO(BaseFigure figure) {
 		AbstractDTO dto = null;
-		for(NewFigureMap map : paths.values()){
-			if(map.containsFigure(figure)){
+		for (NewFigureMap map : paths.values()) {
+			if (map.containsFigure(figure)) {
 				dto = map.getFigureDTO(figure);
 			}
 		}
 		return dto;
 	}
-	
-	public String getParentFigurePath(BaseFigure figure){
+
+	public String getParentFigurePath(BaseFigure figure) {
 		String path = null;
-		for(String key : paths.keySet()){
-			if(paths.get(key).containsFigure(figure)){
+		for (String key : paths.keySet()) {
+			if (paths.get(key).containsFigure(figure)) {
 				path = key;
 			}
 		}
@@ -84,11 +84,11 @@ public class NewDrawingState {
 		if (null != parentState) {
 			AbstractDTO contextDTO = parentState.getFigureDTO(contextFigure);
 			String path = null;
-			if(contextDTO instanceof ModuleDTO){
+			if (contextDTO instanceof ModuleDTO) {
 				path = ((ModuleDTO) contextDTO).logicalPath;
-			}else if (contextDTO instanceof AnalysedModuleDTO){
+			} else if (contextDTO instanceof AnalysedModuleDTO) {
 				path = ((AnalysedModuleDTO) contextDTO).uniqueName;
-			}else{
+			} else {
 				throw new RuntimeException("DTO type not supported");
 			}
 			addFigure(path, contextFigure, contextDTO);
@@ -97,7 +97,11 @@ public class NewDrawingState {
 
 	public ArrayList<BaseFigure> getFiguresByPath(String path) {
 		NewFigureMap pathMap = paths.get(path);
-		return pathMap.getFigures();
+		if (null != pathMap) {
+			return pathMap.getFigures();
+		} else {
+			return new ArrayList<BaseFigure>(); 
+		}
 	}
 
 	public void addDependency(RelationFigure relationFigure, DependencyDTO[] dtos) {
@@ -113,38 +117,38 @@ public class NewDrawingState {
 		setMaxViolations(dtos.length);
 		violationDTOMap.put(relationFigure, dtos);
 	}
-	
+
 	public ViolationDTO[] getViolationDTOs(RelationFigure relationFigure) {
 		return violationDTOMap.get(relationFigure);
 	}
-	
-	private void setMaxDependencies(int newMax){
-		if(newMax > maxDependencies){
+
+	private void setMaxDependencies(int newMax) {
+		if (newMax > maxDependencies) {
 			maxDependencies = newMax;
 		}
-		if(newMax > maxAll){
+		if (newMax > maxAll) {
 			maxAll = newMax;
 		}
 	}
-	
-	public int getMaxDependencies(){
+
+	public int getMaxDependencies() {
 		return maxDependencies;
 	}
-	
-	private void setMaxViolations(int newMax){
-		if(newMax > maxViolations){
+
+	private void setMaxViolations(int newMax) {
+		if (newMax > maxViolations) {
 			maxViolations = newMax;
 		}
-		if(newMax > maxAll){
+		if (newMax > maxAll) {
 			maxAll = newMax;
 		}
 	}
-	
-	public int getMaxViolations(){
+
+	public int getMaxViolations() {
 		return maxViolations;
 	}
-	
-	public int getMaxAll(){
+
+	public int getMaxAll() {
 		return maxAll;
 	}
 }
