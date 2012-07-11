@@ -5,7 +5,6 @@ import husacct.analyse.IAnalyseService;
 import husacct.common.dto.AbstractDTO;
 import husacct.common.dto.DependencyDTO;
 import husacct.common.dto.ModuleDTO;
-import husacct.common.dto.PhysicalPathDTO;
 import husacct.common.dto.ViolationDTO;
 import husacct.common.services.IServiceListener;
 import husacct.define.IDefineService;
@@ -77,28 +76,28 @@ public class DefinedController extends DrawingController {
 
 	@Override
 	public void moduleZoom(BaseFigure[] figures) {
-		super.notifyServiceListeners();
-		definedFigures = new HashMap<String, BaseFigure>();
-		ArrayList<String> parentNames = new ArrayList<String>();
-		for (BaseFigure figure : figures) {
-			if (figure.isModule()) {
-				try {
-					ModuleDTO parentDTO = (ModuleDTO) getFigureMap().getModuleDTO(figure);
-					parentNames.add(parentDTO.logicalPath);
-					definedFigures.put(parentDTO.logicalPath, figure);
-				} catch (Exception e) {
-					e.printStackTrace();
-					logger.warn("Could not zoom on this object: " + figure.getName() + ". Expected a different DTO type.");
-				}
-			} else {
-				logger.warn("Could not zoom on this object: " + figure.getName() + ". Not a module to zoom on.");
-			}
-		}
-
-		if (parentNames.size() > 0) {
-			saveSingleLevelFigurePositions();
-			getAndDrawModulesIn(parentNames.toArray(new String[] {}));
-		}
+//		super.notifyServiceListeners();
+//		definedFigures = new HashMap<String, BaseFigure>();
+//		ArrayList<String> parentNames = new ArrayList<String>();
+//		for (BaseFigure figure : figures) {
+//			if (figure.isModule()) {
+//				try {
+//					ModuleDTO parentDTO = (ModuleDTO) getFigureMap().getModuleDTO(figure);
+//					parentNames.add(parentDTO.logicalPath);
+//					definedFigures.put(parentDTO.logicalPath, figure);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					logger.warn("Could not zoom on this object: " + figure.getName() + ". Expected a different DTO type.");
+//				}
+//			} else {
+//				logger.warn("Could not zoom on this object: " + figure.getName() + ". Not a module to zoom on.");
+//			}
+//		}
+//
+//		if (parentNames.size() > 0) {
+//			saveSingleLevelFigurePositions();
+//			getAndDrawModulesIn(parentNames.toArray(new String[] {}));
+//		}
 	}
 
 	@Override
@@ -166,40 +165,40 @@ public class DefinedController extends DrawingController {
 	}
 
 	private void getAndDrawModulesIn(String[] parentNames) {
-		if (parentNames.length == 0) {
-			drawArchitecture(getCurrentDrawingDetail());
-		} else {
-			HashMap<String, ArrayList<AbstractDTO>> allChildren = new HashMap<String, ArrayList<AbstractDTO>>();
-			for (String parentName : parentNames) {
-				AbstractDTO[] children = defineService.getChildrenFromModule(parentName);
-				if (parentName.equals("") || parentName.equals("**")) {
-					drawArchitecture(getCurrentDrawingDetail());
-					continue;
-				} else if (children.length > 0) {
-					ArrayList<AbstractDTO> knownChildren = new ArrayList<AbstractDTO>();
-					for (AbstractDTO child : children) {
-						knownChildren.add(child);
-					}
-					allChildren.put(parentName, knownChildren);
-				} else {
-					AbstractDTO value = getFigureMap().getModuleDTO(definedFigures.get(parentName));
-					ArrayList<AbstractDTO> tmpList = new ArrayList<AbstractDTO>();
-					tmpList.add(value);
-					allChildren.put("", tmpList);
-					logger.warn("Tried to draw modules for \"" + parentName + "\", but it has no children.");
-				}
-			}
-			setCurrentPaths(parentNames);
-
-			Set<String> parentNamesKeySet = allChildren.keySet();
-			if (parentNamesKeySet.size() == 1) {
-				String onlyParentModule = parentNamesKeySet.iterator().next();
-				ArrayList<AbstractDTO> onlyParentChildren = allChildren.get(onlyParentModule);
-				//drawModulesAndLines(onlyParentChildren.toArray(new AbstractDTO[] {}));
-			} else {
-				//drawModulesAndLines(allChildren);
-			}
-		}
+//		if (parentNames.length == 0) {
+//			drawArchitecture(getCurrentDrawingDetail());
+//		} else {
+//			HashMap<String, ArrayList<AbstractDTO>> allChildren = new HashMap<String, ArrayList<AbstractDTO>>();
+//			for (String parentName : parentNames) {
+//				AbstractDTO[] children = defineService.getChildrenFromModule(parentName);
+//				if (parentName.equals("") || parentName.equals("**")) {
+//					drawArchitecture(getCurrentDrawingDetail());
+//					continue;
+//				} else if (children.length > 0) {
+//					ArrayList<AbstractDTO> knownChildren = new ArrayList<AbstractDTO>();
+//					for (AbstractDTO child : children) {
+//						knownChildren.add(child);
+//					}
+//					allChildren.put(parentName, knownChildren);
+//				} else {
+//					AbstractDTO value = getFigureMap().getModuleDTO(definedFigures.get(parentName));
+//					ArrayList<AbstractDTO> tmpList = new ArrayList<AbstractDTO>();
+//					tmpList.add(value);
+//					allChildren.put("", tmpList);
+//					logger.warn("Tried to draw modules for \"" + parentName + "\", but it has no children.");
+//				}
+//			}
+//			setCurrentPaths(parentNames);
+//
+//			Set<String> parentNamesKeySet = allChildren.keySet();
+//			if (parentNamesKeySet.size() == 1) {
+//				String onlyParentModule = parentNamesKeySet.iterator().next();
+//				ArrayList<AbstractDTO> onlyParentChildren = allChildren.get(onlyParentModule);
+//				//drawModulesAndLines(onlyParentChildren.toArray(new AbstractDTO[] {}));
+//			} else {
+//				//drawModulesAndLines(allChildren);
+//			}
+//		}
 	}
 
 	@Override

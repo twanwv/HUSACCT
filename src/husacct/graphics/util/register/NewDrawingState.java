@@ -111,8 +111,12 @@ public class NewDrawingState {
 		dependencyDTOMap.put(relationFigure, dtos);
 	}
 
-	public DependencyDTO[] getDependencyDTOs(RelationFigure relationFigure) {
+	public DependencyDTO[] getDependencyDTOs(BaseFigure relationFigure) {
 		return dependencyDTOMap.get(relationFigure);
+	}
+
+	public boolean isDependencyLine(BaseFigure selectedFigure) {
+		return dependencyDTOMap.containsKey(selectedFigure);
 	}
 
 	public void addViolation(RelationFigure relationFigure, ViolationDTO[] dtos) {
@@ -120,12 +124,24 @@ public class NewDrawingState {
 		violationDTOMap.put(relationFigure, dtos);
 	}
 
-	public ViolationDTO[] getViolationDTOs(RelationFigure relationFigure) {
+	public ViolationDTO[] getViolationDTOs(BaseFigure relationFigure) {
 		return violationDTOMap.get(relationFigure);
+	}
+
+	public boolean isViolatedFigure(BaseFigure selectedFigure) {
+		return violatedFigureDTOMap.containsKey(selectedFigure);
 	}
 	
 	public void addViolatedFigure(BaseFigure figure, ViolationDTO[] dtos) {
 		violatedFigureDTOMap.put(figure, dtos);
+	}
+	
+	public ViolationDTO[] getViolatedDTOs(BaseFigure figure) {
+		return violatedFigureDTOMap.get(figure);
+	}
+	
+	public boolean isViolationLine(BaseFigure selectedFigure) {
+		return violationDTOMap.containsKey(selectedFigure);
 	}
 
 	private void setMaxDependencies(int newMax) {

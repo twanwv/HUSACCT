@@ -21,7 +21,6 @@ import husacct.graphics.task.layout.LayoutStrategy;
 import husacct.graphics.task.layout.NoLayoutStrategy;
 import husacct.graphics.util.DrawingDetail;
 import husacct.graphics.util.DrawingLayoutStrategy;
-import husacct.graphics.util.FigureMap;
 import husacct.graphics.util.register.DrawingRegister;
 import husacct.graphics.util.register.NewDrawingState;
 import husacct.graphics.util.threads.DrawingFiguresThread;
@@ -54,8 +53,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 	private LayoutStrategy layoutStrategy;
 
 	protected ThreadMonitor threadMonitor;
-	@Deprecated
-	private FigureMap figureMap = new FigureMap();
 	private DrawingRegister register = new DrawingRegister();
 
 	public DrawingController() {
@@ -94,11 +91,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 			logger.warn("A drawing thread is already running. Wait until it has finished before running another.");
 			graphicsFrame.setOutOfDate();
 		}
-	}
-
-	@Deprecated
-	public FigureMap getFigureMap() {
-		return figureMap;
 	}
 
 	@Deprecated
@@ -152,7 +144,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 	public void hideViolations() {
 		super.hideViolations();
 		graphicsFrame.turnOffViolations();
-		drawing.setFiguresNotViolated(figureMap.getViolatedFigures());
 	}
 
 	public void showSmartLines() {
@@ -170,7 +161,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	public void clearDrawing() {
-		figureMap.clearAll();
 		drawing.clearAll();
 
 		drawingView.clearSelection();
@@ -194,14 +184,17 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	@Override
-	public void figureSelected(BaseFigure[] figures) {
-		BaseFigure selectedFigure = figures[0];
-		if (figureMap.isViolatedFigure(selectedFigure)) {
-			graphicsFrame.showViolationsProperties(figureMap.getViolatedDTOs(selectedFigure));
-		} else if (figureMap.isViolationLine(selectedFigure)) {
-			graphicsFrame.showViolationsProperties(figureMap.getViolationDTOs(selectedFigure));
-		} else if (figureMap.isDependencyLine(selectedFigure)) {
-			graphicsFrame.showDependenciesProperties(figureMap.getDependencyDTOs(selectedFigure));
+	public void figureSelected(BaseFigure[] selectedFigures) {
+		if (selectedFigures.length == 1) {
+			BaseFigure selectedFigure = selectedFigures[0];
+			NewDrawingState state = getCurrentState();
+			if (state.isViolatedFigure(selectedFigure)) {
+				graphicsFrame.showViolationsProperties(state.getViolatedDTOs(selectedFigure));
+			} else if (state.isViolationLine(selectedFigure)) {
+				graphicsFrame.showViolationsProperties(state.getViolationDTOs(selectedFigure));
+			} else if (state.isDependencyLine(selectedFigure)) {
+				graphicsFrame.showDependenciesProperties(state.getDependencyDTOs(selectedFigure));
+			}
 		} else {
 			graphicsFrame.hideProperties();
 		}
@@ -219,7 +212,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	protected void updateLayout() {
-		String currentPaths = getCurrentPathsToString();
+		String currentPaths = getCurrentState().getFullPath();
 
 		if (hasSavedFigureStates(currentPaths)) {
 			restoreFigurePositions(currentPaths);
@@ -332,7 +325,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		else
 			state = new DrawingState(drawing);
 
-		state.save(figureMap);
+		//state.save(figureMap);
 		storedStates.put(paths, state);
 	}
 
@@ -345,7 +338,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected void restoreFigurePositions(String paths) {
 		if (storedStates.containsKey(paths)) {
 			DrawingState state = storedStates.get(paths);
-			state.restore(figureMap);
+			//state.restore(figureMap);
 			drawingView.setHasHiddenFigures(state.hasHiddenFigures());
 		}
 	}
@@ -466,7 +459,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 				} catch (Exception e) {
 					logger.error("Could not attach decorator to figure to indicate internal violations.", e);
 				}
-			}else{
+			} else {
 				RelationFigure violationFigure = figureFactory.createFigure(violationDTOs);
 				state.addViolation(violationFigure, violationDTOs);
 				drawing.addRelation(violationFigure, figureFrom, figureTo);

@@ -1,7 +1,6 @@
 package husacct.graphics.presentation;
 
 import husacct.graphics.abstraction.FileManager;
-import husacct.graphics.presentation.decorators.ViolationsDecorator;
 import husacct.graphics.presentation.figures.BaseFigure;
 import husacct.graphics.presentation.figures.RelationFigure;
 import husacct.graphics.presentation.linelayoutstrategies.ConnectorLineSeparationStrategy;
@@ -99,15 +98,6 @@ public class Drawing extends QuadTreeDrawing {
 	public boolean addRelation(RelationFigure relationFigure, BaseFigure figureFrom, BaseFigure figureTo){
 		connectionStrategy.connect(relationFigure, figureFrom, figureTo);
 		return add(relationFigure);
-	}
-
-	public void setFiguresNotViolated(ArrayList<BaseFigure> arrayList) {
-		willChange();
-		for (BaseFigure figure : arrayList) {
-			figure.removeDecoratorByType(ViolationsDecorator.class);
-		}
-		invalidate();
-		changed();
 	}
 	
 	public boolean hasHiddenFigures(){
