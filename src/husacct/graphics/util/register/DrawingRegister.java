@@ -22,7 +22,7 @@ public class DrawingRegister {
 
 	public void addState(NewDrawingState state) {
 		if (contains(state)) {
-			NewDrawingState parentState = getState(state.getPath()).getParentState();
+			NewDrawingState parentState = getState(state.getFullPath()).getParentState();
 			previousState = parentState;
 		} else {
 			previousState = currentState;
@@ -31,7 +31,7 @@ public class DrawingRegister {
 		if (null != previousState) {
 			state.setParentState(previousState);
 		}
-		states.put(state.getPath(), state);
+		states.put(state.getFullPath(), state);
 	}
 
 	public NewDrawingState getState(String path) {
@@ -39,6 +39,6 @@ public class DrawingRegister {
 	}
 
 	public boolean contains(NewDrawingState state) {
-		return states.containsKey(state.getPath());
+		return states.containsKey(state.getFullPath());
 	}
 }

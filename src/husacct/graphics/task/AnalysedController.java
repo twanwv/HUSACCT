@@ -28,7 +28,7 @@ public class AnalysedController extends DrawingController {
 		super();
 		initializeServices();
 	}
-	
+
 	private void initializeServices() {
 		analyseService = ServiceProvider.getInstance().getAnalyseService();
 		analyseService.addServiceListener(new IServiceListener() {
@@ -67,7 +67,7 @@ public class AnalysedController extends DrawingController {
 		super.notifyServiceListeners();
 		AbstractDTO[] modules = analyseService.getRootModules();
 		createState("");
-		for(AbstractDTO dto : modules){
+		for (AbstractDTO dto : modules) {
 			addFigure("", dto);
 		}
 		resetCurrentPaths();
@@ -78,11 +78,11 @@ public class AnalysedController extends DrawingController {
 	}
 
 	@Override
-	protected DependencyDTO[] getDependenciesBetween(BaseFigure figureFrom, BaseFigure figureTo) {
-		AnalysedModuleDTO dtoFrom = (AnalysedModuleDTO) getFigureMap().getModuleDTO(figureFrom);
-		AnalysedModuleDTO dtoTo = (AnalysedModuleDTO) getFigureMap().getModuleDTO(figureTo);
-		if (!figureFrom.equals(figureTo) && null != dtoFrom && null != dtoTo) {
-			return analyseService.getDependencies(dtoFrom.uniqueName, dtoTo.uniqueName);
+	protected DependencyDTO[] getDependenciesBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo) {
+		try {
+			return analyseService.getDependencies(((AnalysedModuleDTO) dtoFrom).uniqueName, ((AnalysedModuleDTO) dtoTo).uniqueName);
+		} catch (Exception e) {
+			logger.error("Could not fetch dependency between two modules.", e);
 		}
 		return new DependencyDTO[] {};
 	}
@@ -121,12 +121,12 @@ public class AnalysedController extends DrawingController {
 				logger.warn("Could not zoom on this object: " + figure.getName() + ". Not a module to zoom on.");
 			}
 		}
-		
+
 		String combinedPath = createCombinedPathHelper(parentFigures);
 		createState(combinedPath);
-		
+
 		if (parentNames.size() > 0) {
-//			saveSingleLevelFigurePositions();
+			// saveSingleLevelFigurePositions();
 			getAndDrawModulesIn(parentNames.toArray(new String[] {}));
 		}
 	}

@@ -239,9 +239,9 @@ public abstract class DrawingController extends DrawingSettingsController {
 	public void drawSingleLevelModules(AbstractDTO[] modules) {
 		NewDrawingState state = getCurrentState();
 		ArrayList<String> paths = state.getPaths();
-		for(String path : paths){
+		for (String path : paths) {
 			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
-			for(BaseFigure figure : figures){
+			for (BaseFigure figure : figures) {
 				drawing.add(figure);
 			}
 		}
@@ -328,21 +328,30 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	public void drawDependenciesForShownModules() {
-		BaseFigure[] shownModules = drawing.getShownModules();
-		for (BaseFigure figureFrom : shownModules) {
-			for (BaseFigure figureTo : shownModules) {
-				getAndDrawDependenciesBetween(figureFrom, figureTo);
+		NewDrawingState state = getCurrentState();
+		ArrayList<String> paths = state.getPaths();
+		for (String path : paths) {
+			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
+			for (BaseFigure figureFrom : figures) {
+				for (BaseFigure figureTo : figures) {
+					getAndDrawDependenciesBetween(figureFrom, figureTo);
+				}
 			}
 		}
 	}
 
 	private void getAndDrawDependenciesBetween(BaseFigure figureFrom, BaseFigure figureTo) {
-		DependencyDTO[] dependencies = (DependencyDTO[]) getDependenciesBetween(figureFrom, figureTo);
-		if (dependencies.length > 0) {
-			drawDependenciesBetween(dependencies, figureFrom, figureTo);
+		if (!figureFrom.equals(figureTo)) {
+			AbstractDTO dtoFrom = getCurrentState().getFigureDTO(figureFrom);
+			AbstractDTO dtoTo = getCurrentState().getFigureDTO(figureTo);
+			DependencyDTO[] dependencies = getDependenciesBetween(dtoFrom, dtoTo);
+			if (dependencies.length > 0) {
+				addDependency(dependencies, figureFrom, figureTo);
+			}
 		}
 	}
 
+	@Deprecated
 	public void drawDependenciesBetween(DependencyDTO[] dependencies, BaseFigure figureFrom, BaseFigure figureTo) {
 		RelationFigure dependencyFigure = null;
 		try {
@@ -357,7 +366,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		}
 	}
 
-	protected abstract DependencyDTO[] getDependenciesBetween(BaseFigure figureFrom, BaseFigure figureTo);
+	protected abstract DependencyDTO[] getDependenciesBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo);
 
 	public void drawViolationsForShownModules() {
 		BaseFigure[] shownModules = drawing.getShownModules();
@@ -522,6 +531,28 @@ public abstract class DrawingController extends DrawingSettingsController {
 		try {
 			BaseFigure figure = figureFactory.createFigure(dto);
 			getCurrentState().addFigure(parentPath, figure, dto);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	protected void addDependency(DependencyDTO[] dependencyDTOs, BaseFigure figureFrom, BaseFigure figureTo) {
+		try {
+			RelationFigure dependencyFigure = figureFactory.createFigure(dependencyDTOs);
+			getCurrentState().addDependency(dependencyFigure, dependencyDTOs);
+			connectionStrategy.connect(dependencyFigure, figureFrom, figureTo);
+			drawing.add(dependencyFigure);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	protected void addViolation(ViolationDTO[] violationDTOs) {
+		try {
+			RelationFigure violationFigure = figureFactory.createFigure(violationDTOs);
+			getCurrentState().addViolation(violationFigure, violationDTOs);
+			// connectionStrategy.connect(dependencyFigure, figureFrom,
+			// figureTo); //for violation
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
