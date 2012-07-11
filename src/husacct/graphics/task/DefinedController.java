@@ -70,7 +70,7 @@ public class DefinedController extends DrawingController {
 		if (DrawingDetail.WITH_VIOLATIONS == detail) {
 			showViolations();
 		}
-		drawModulesAndLines(modules);
+		//drawModulesAndLines(modules);
 	}
 
 	private HashMap<String, BaseFigure> definedFigures;
@@ -157,7 +157,7 @@ public class DefinedController extends DrawingController {
 			ModuleDTO[] children = defineService.getChildrenFromModule(parentName);
 			if (children.length > 0) {
 				setCurrentPaths(new String[] { parentName });
-				drawModulesAndLines(children);
+				//drawModulesAndLines(children);
 			} else {
 				logger.warn("Tried to draw modules for \"" + parentName + "\", but it has no children.");
 			}
@@ -194,9 +194,9 @@ public class DefinedController extends DrawingController {
 			if (parentNamesKeySet.size() == 1) {
 				String onlyParentModule = parentNamesKeySet.iterator().next();
 				ArrayList<AbstractDTO> onlyParentChildren = allChildren.get(onlyParentModule);
-				drawModulesAndLines(onlyParentChildren.toArray(new AbstractDTO[] {}));
+				//drawModulesAndLines(onlyParentChildren.toArray(new AbstractDTO[] {}));
 			} else {
-				drawModulesAndLines(allChildren);
+				//drawModulesAndLines(allChildren);
 			}
 		}
 	}

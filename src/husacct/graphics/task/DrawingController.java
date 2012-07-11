@@ -13,7 +13,6 @@ import husacct.graphics.presentation.DrawingView;
 import husacct.graphics.presentation.GraphicsFrame;
 import husacct.graphics.presentation.figures.BaseFigure;
 import husacct.graphics.presentation.figures.FigureFactory;
-import husacct.graphics.presentation.figures.ParentFigure;
 import husacct.graphics.presentation.figures.RelationFigure;
 import husacct.graphics.task.layout.BasicLayoutStrategy;
 import husacct.graphics.task.layout.DrawingState;
@@ -27,14 +26,10 @@ import husacct.graphics.util.register.DrawingRegister;
 import husacct.graphics.util.register.NewDrawingState;
 import husacct.graphics.util.threads.DrawingFiguresThread;
 import husacct.graphics.util.threads.DrawingLinesThread;
-import husacct.graphics.util.threads.DrawingMultiLevelThread;
-import husacct.graphics.util.threads.DrawingSingleLevelThread;
 import husacct.graphics.util.threads.ThreadMonitor;
 
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.swing.JInternalFrame;
@@ -106,6 +101,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		return figureMap;
 	}
 
+	@Deprecated
 	public Drawing getDrawing() {
 		return drawing;
 	}
@@ -179,7 +175,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 		drawingView.clearSelection();
 		drawingView.invalidate();
-		
+
 		drawing.setState(getCurrentState());
 	}
 
@@ -220,78 +216,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public void drawArchitecture(DrawingDetail detail) {
 		drawingView.cannotZoomOut();
-	}
-
-	protected void drawModulesAndLines(AbstractDTO[] modules) {
-		runDrawSingleLevelTask(modules);
-	}
-
-	private void runDrawSingleLevelTask(AbstractDTO[] modules) {
-		runThread(new DrawingSingleLevelThread(this, modules));
-	}
-
-	public void drawSingleLevel(AbstractDTO[] modules) {
-		graphicsFrame.setUpToDate();
-		drawSingleLevelModules(modules);
-		updateLayout();
-		drawLines();
-		graphicsFrame.setCurrentPaths(getCurrentPaths());
-		graphicsFrame.updateGUI();
-	}
-
-	public void drawSingleLevelModules(AbstractDTO[] modules) {
-		NewDrawingState state = getCurrentState();
-		ArrayList<String> paths = state.getPaths();
-		for (String path : paths) {
-			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
-			for (BaseFigure figure : figures) {
-				drawing.add(figure);
-			}
-		}
-	}
-
-	protected void drawModulesAndLines(HashMap<String, ArrayList<AbstractDTO>> modules) {
-		runDrawMultiLevelTask(modules);
-	}
-
-	private void runDrawMultiLevelTask(HashMap<String, ArrayList<AbstractDTO>> modules) {
-		runThread(new DrawingMultiLevelThread(this, modules));
-	}
-
-	public void drawMultiLevel(HashMap<String, ArrayList<AbstractDTO>> modules) {
-		drawMultiLevelModules(modules);
-		updateLayout();
-		drawLines();
-		graphicsFrame.setCurrentPaths(getCurrentPaths());
-		graphicsFrame.updateGUI();
-	}
-
-	public void drawMultiLevelModules(HashMap<String, ArrayList<AbstractDTO>> modules) {
-		graphicsFrame.setUpToDate();
-		for (String parentName : modules.keySet()) {
-			ParentFigure parentFigure = null;
-			if (!parentName.isEmpty()) {
-				parentFigure = figureFactory.createParentFigure(parentName);
-				drawing.add(parentFigure);
-			}
-			for (AbstractDTO dto : modules.get(parentName)) {
-				try {
-					BaseFigure generatedFigure = figureFactory.createFigure(dto);
-
-					if (parentFigure != null) {
-						parentFigure.add(generatedFigure);
-					}
-
-					drawing.add(generatedFigure);
-					figureMap.linkModule(generatedFigure, dto);
-				} catch (Exception e) {
-					logger.error("Could not generate and display figure.", e);
-				}
-			}
-			if (!parentName.isEmpty()) {
-				parentFigure.updateLayout();
-			}
-		}
 	}
 
 	protected void updateLayout() {
@@ -350,22 +274,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 			if (dependencies.length > 0) {
 				addDependency(dependencies, figureFrom, figureTo);
 			}
-		}
-	}
-
-	@Deprecated
-	public void drawDependenciesBetween(DependencyDTO[] dependencies, BaseFigure figureFrom, BaseFigure figureTo) {
-		RelationFigure dependencyFigure = null;
-		try {
-			dependencyFigure = figureFactory.createFigure(dependencies);
-		} catch (Exception e) {
-			logger.error("Could not create a dependency figure.", e);
-		}
-		if (null != dependencyFigure) {
-			figureMap.linkDependencies(dependencyFigure, dependencies);
-			// connectionStrategy.connect(dependencyFigure, figureFrom,
-			// figureTo);
-			drawing.add(dependencyFigure);
 		}
 	}
 
@@ -432,12 +340,14 @@ public abstract class DrawingController extends DrawingSettingsController {
 		drawing.showExportToImagePanel();
 	}
 
+	@Deprecated
 	public void saveSingleLevelFigurePositions() {
 		if (getCurrentPaths().length < 2) {
 			saveFigurePositions();
 		}
 	}
 
+	@Deprecated
 	protected void saveFigurePositions() {
 		String paths = getCurrentPathsToString();
 		DrawingState state;
@@ -450,10 +360,12 @@ public abstract class DrawingController extends DrawingSettingsController {
 		storedStates.put(paths, state);
 	}
 
+	@Deprecated
 	protected boolean hasSavedFigureStates(String paths) {
 		return storedStates.containsKey(paths);
 	}
 
+	@Deprecated
 	protected void restoreFigurePositions(String paths) {
 		if (storedStates.containsKey(paths)) {
 			DrawingState state = storedStates.get(paths);
@@ -462,24 +374,9 @@ public abstract class DrawingController extends DrawingSettingsController {
 		}
 	}
 
+	@Deprecated
 	protected void resetAllFigurePositions() {
 		storedStates.clear();
-	}
-
-	protected void printFigures(String msg) {
-		if (!debugPrint)
-			return;
-
-		System.out.println(msg);
-
-		for (Figure f : drawing.getChildren()) {
-			BaseFigure bf = (BaseFigure) f;
-			Rectangle2D.Double bounds = bf.getBounds();
-
-			String rect = String.format(Locale.US, "[x=%1.2f,y=%1.2f,w=%1.2f,h=%1.2f]", bounds.x, bounds.y, bounds.width, bounds.height);
-			if (bf.getName().equals("Main"))
-				System.out.println(String.format("%s: %s", bf.getName(), rect));
-		}
 	}
 
 	@Override
@@ -502,7 +399,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 		Set<Figure> selection = drawingView.getSelectedFigures();
 		if (selection.size() > 0) {
 			BaseFigure[] selectedFigures = selection.toArray(new BaseFigure[selection.size()]);
-
 			moduleZoom(selectedFigures);
 		}
 	}
@@ -528,26 +424,35 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected void createState(String combinedPath) {
 		register.addState(new NewDrawingState(combinedPath));
 	}
-	
-	protected void drawDrawing(){
+
+	protected void drawDrawing() {
 		runThread(new DrawingFiguresThread(this));
 	}
-	
-	public void drawDrawingReal(){
+
+	public void drawDrawingReal() {
 		drawFigures();
 		updateLayout();
 		drawLines();
-//		graphicsFrame.setCurrentPaths(getCurrentPaths());
+		// graphicsFrame.setCurrentPaths(getCurrentPaths());
 		graphicsFrame.updateGUI();
 	}
-	
-	public void drawFigures(){
+
+	public void drawFigures() {
 		NewDrawingState state = getCurrentState();
 		ArrayList<String> paths = state.getPaths();
+		boolean mulipleParents = paths.size() > 1;
 		for (String path : paths) {
+			BaseFigure parentFigure = null;
+			if(mulipleParents){
+				parentFigure = figureFactory.createParentFigure(path);
+				drawing.add(parentFigure);
+			}
 			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
 			for (BaseFigure figure : figures) {
 				drawing.add(figure);
+				if(mulipleParents){
+					parentFigure.add(figure);
+				}
 			}
 		}
 	}
@@ -559,6 +464,10 @@ public abstract class DrawingController extends DrawingSettingsController {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
+	}
+
+	protected void addContextFigure(BaseFigure contextFigure) {
+		getCurrentState().addContextFigure(contextFigure);
 	}
 
 	protected void addDependency(DependencyDTO[] dependencyDTOs, BaseFigure figureFrom, BaseFigure figureTo) {
@@ -581,16 +490,23 @@ public abstract class DrawingController extends DrawingSettingsController {
 		}
 	}
 
-	protected String createCombinedPathHelper(ArrayList<BaseFigure> figures) {
-		String s = "";
+	protected ArrayList<String> getParentNamesHelper(ArrayList<BaseFigure> figures) {
+		ArrayList<String> names = new ArrayList<String>();
 		for (BaseFigure figure : figures) {
 			AbstractDTO dto = getCurrentState().getFigureDTO(figure);
 			if (dto instanceof ModuleDTO) {
-				s += ((ModuleDTO) dto).logicalPath + "+";
+				names.add(((ModuleDTO) dto).logicalPath);
 			} else if (dto instanceof AnalysedModuleDTO) {
-				s += ((AnalysedModuleDTO) dto).uniqueName + "+";
+				names.add(((AnalysedModuleDTO) dto).uniqueName);
 			}
-			System.err.println(s);
+		}
+		return names;
+	}
+
+	protected String createCombinedPathHelper(ArrayList<String> parents) {
+		String s = "";
+		for (String parent : parents) {
+			s += parent + "+";
 		}
 		return s;
 	}
