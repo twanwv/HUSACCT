@@ -287,30 +287,10 @@ public abstract class DrawingController extends DrawingSettingsController {
 			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
 			for (BaseFigure figureFrom : figures) {
 				for (BaseFigure figureTo : figures) {
-					if (figureFrom == figureTo) {
-						getAndDrawViolationsIn(figureFrom);
-					} else {
-						drawViolationsBetween(figureFrom, figureTo);
-					}
+					drawViolationsBetween(figureFrom, figureTo);
 				}
 			}
 		}
-	}
-
-	private void getAndDrawViolationsIn(BaseFigure figureFrom) {
-//		ViolationDTO[] violations = getViolationsBetween(figureFrom, figureFrom);
-//		if (violations.length > 0) {
-//			drawViolationsIn(violations, figureFrom);
-//		}
-	}
-
-	public void drawViolationsIn(ViolationDTO[] violations, BaseFigure figureFrom) {
-//		try {
-//			figureFrom.addDecorator(figureFactory.createViolationsDecorator(violations));
-//		} catch (Exception e) {
-//			logger.error("Could not attach decorator to figure to indicate internal violations.", e);
-//		}
-//		figureMap.linkViolatedModule(figureFrom, violations);
 	}
 
 	private void drawViolationsBetween(BaseFigure figureFrom, BaseFigure figureTo) {
@@ -439,14 +419,14 @@ public abstract class DrawingController extends DrawingSettingsController {
 		boolean mulipleParents = paths.size() > 1;
 		for (String path : paths) {
 			BaseFigure parentFigure = null;
-			if(mulipleParents){
+			if (mulipleParents) {
 				parentFigure = figureFactory.createParentFigure(path);
 				drawing.add(parentFigure);
 			}
 			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
 			for (BaseFigure figure : figures) {
 				drawing.add(figure);
-				if(mulipleParents){
+				if (mulipleParents) {
 					parentFigure.add(figure);
 				}
 			}
@@ -477,10 +457,20 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	protected void addViolation(ViolationDTO[] violationDTOs, BaseFigure figureFrom, BaseFigure figureTo) {
+		NewDrawingState state = getCurrentState();
 		try {
-			RelationFigure violationFigure = figureFactory.createFigure(violationDTOs);
-			getCurrentState().addViolation(violationFigure, violationDTOs);
-			drawing.addRelation(violationFigure, figureFrom, figureTo);
+			if (figureFrom.equals(figureTo)) {
+				try {
+					figureFrom.addDecorator(figureFactory.createViolationsDecorator(violationDTOs));
+					state.addViolatedFigure(figureFrom, violationDTOs);
+				} catch (Exception e) {
+					logger.error("Could not attach decorator to figure to indicate internal violations.", e);
+				}
+			}else{
+				RelationFigure violationFigure = figureFactory.createFigure(violationDTOs);
+				state.addViolation(violationFigure, violationDTOs);
+				drawing.addRelation(violationFigure, figureFrom, figureTo);
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -502,11 +492,11 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected String createCombinedPathHelper(ArrayList<String> parents) {
 		String s = "";
 		for (String parent : parents) {
-			if(!parent.isEmpty()){
+			if (!parent.isEmpty()) {
 				s += parent + "+";
 			}
 		}
-		if(s.length()>0){
+		if (s.length() > 0) {
 			s = s.substring(0, s.length() - 1);
 		}
 		return s;

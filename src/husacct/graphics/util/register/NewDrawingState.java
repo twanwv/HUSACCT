@@ -17,6 +17,7 @@ public class NewDrawingState {
 	private HashMap<String, NewFigureMap> paths;
 	private HashMap<RelationFigure, DependencyDTO[]> dependencyDTOMap;
 	private HashMap<RelationFigure, ViolationDTO[]> violationDTOMap;
+	private HashMap<BaseFigure, ViolationDTO[]> violatedFigureDTOMap;
 	private HashMap<BaseFigure, Double> figurePositions;
 
 	private int maxDependencies, maxViolations, maxAll;
@@ -26,6 +27,7 @@ public class NewDrawingState {
 		paths = new HashMap<String, NewFigureMap>();
 		dependencyDTOMap = new HashMap<RelationFigure, DependencyDTO[]>();
 		violationDTOMap = new HashMap<RelationFigure, ViolationDTO[]>();
+		violatedFigureDTOMap = new HashMap<BaseFigure, ViolationDTO[]>();
 	}
 
 	public void setParentState(NewDrawingState state) {
@@ -120,6 +122,10 @@ public class NewDrawingState {
 
 	public ViolationDTO[] getViolationDTOs(RelationFigure relationFigure) {
 		return violationDTOMap.get(relationFigure);
+	}
+	
+	public void addViolatedFigure(BaseFigure figure, ViolationDTO[] dtos) {
+		violatedFigureDTOMap.put(figure, dtos);
 	}
 
 	private void setMaxDependencies(int newMax) {
