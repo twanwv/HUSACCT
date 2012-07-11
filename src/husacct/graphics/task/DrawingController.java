@@ -506,7 +506,12 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected String createCombinedPathHelper(ArrayList<String> parents) {
 		String s = "";
 		for (String parent : parents) {
-			s += parent + "+";
+			if(!parent.isEmpty()){
+				s += parent + "+";
+			}
+		}
+		if(s.length()>0){
+			s = s.substring(0, s.length() - 1);
 		}
 		return s;
 	}
