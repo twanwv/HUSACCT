@@ -9,6 +9,7 @@ public abstract class DrawingSettingsController implements UserInputListener {
 	protected boolean areDependenciesShown;
 	protected boolean areViolationsShown;
 	
+	@Deprecated
 	protected String[] currentPaths = new String[] {};
 	
 	public DrawingSettingsController(){
@@ -68,10 +69,12 @@ public abstract class DrawingSettingsController implements UserInputListener {
 		areSmartLinesOn = true;
 	}
 	
+	@Deprecated
 	public String[] getCurrentPaths() {
 		return currentPaths;
 	}
 
+	@Deprecated
 	public String getCurrentPathsToString() {
 		String stringPaths = "";
 		for (String path : getCurrentPaths()) {
@@ -80,10 +83,12 @@ public abstract class DrawingSettingsController implements UserInputListener {
 		return stringPaths;
 	}
 
+	@Deprecated
 	public void resetCurrentPaths() {
 		currentPaths = new String[] {};
 	}
 
+	@Deprecated
 	public void setCurrentPaths(String[] paths) {
 		currentPaths = paths;
 	}

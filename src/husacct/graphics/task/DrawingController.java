@@ -17,7 +17,6 @@ import husacct.graphics.presentation.figures.ParentFigure;
 import husacct.graphics.presentation.figures.RelationFigure;
 import husacct.graphics.task.layout.BasicLayoutStrategy;
 import husacct.graphics.task.layout.DrawingState;
-import husacct.graphics.task.layout.FigureConnectorStrategy;
 import husacct.graphics.task.layout.LayeredLayoutStrategy;
 import husacct.graphics.task.layout.LayoutStrategy;
 import husacct.graphics.task.layout.NoLayoutStrategy;
@@ -26,6 +25,7 @@ import husacct.graphics.util.DrawingLayoutStrategy;
 import husacct.graphics.util.FigureMap;
 import husacct.graphics.util.register.DrawingRegister;
 import husacct.graphics.util.register.NewDrawingState;
+import husacct.graphics.util.threads.DrawingFiguresThread;
 import husacct.graphics.util.threads.DrawingLinesThread;
 import husacct.graphics.util.threads.DrawingMultiLevelThread;
 import husacct.graphics.util.threads.DrawingSingleLevelThread;
@@ -59,7 +59,9 @@ public abstract class DrawingController extends DrawingSettingsController {
 	private LayoutStrategy layoutStrategy;
 
 	protected ThreadMonitor threadMonitor;
+	@Deprecated
 	private FigureMap figureMap = new FigureMap();
+	private DrawingRegister register = new DrawingRegister();
 
 	public DrawingController() {
 		super();
@@ -99,6 +101,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		}
 	}
 
+	@Deprecated
 	public FigureMap getFigureMap() {
 		return figureMap;
 	}
@@ -184,6 +187,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		drawing.clearAllLines();
 	}
 
+	@Deprecated
 	public void setCurrentPaths(String[] paths) {
 		super.setCurrentPaths(paths);
 		if (!getCurrentPaths()[0].isEmpty()) {
@@ -230,7 +234,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		graphicsFrame.setUpToDate();
 		drawSingleLevelModules(modules);
 		updateLayout();
-		drawLinesBasedOnSetting();
+		drawLines();
 		graphicsFrame.setCurrentPaths(getCurrentPaths());
 		graphicsFrame.updateGUI();
 	}
@@ -257,7 +261,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	public void drawMultiLevel(HashMap<String, ArrayList<AbstractDTO>> modules) {
 		drawMultiLevelModules(modules);
 		updateLayout();
-		drawLinesBasedOnSetting();
+		drawLines();
 		graphicsFrame.setCurrentPaths(getCurrentPaths());
 		graphicsFrame.updateGUI();
 	}
@@ -313,7 +317,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		runThread(new DrawingLinesThread(this));
 	}
 
-	public void drawLinesBasedOnSetting() {
+	public void drawLines() {
 		if (areDependenciesShown()) {
 			drawDependenciesForShownModules();
 		}
@@ -517,14 +521,35 @@ public abstract class DrawingController extends DrawingSettingsController {
 		return drawingView.isVisible();
 	}
 
-	DrawingRegister register = new DrawingRegister();
-
 	protected NewDrawingState getCurrentState() {
 		return register.getCurrentState();
 	}
 
 	protected void createState(String combinedPath) {
 		register.addState(new NewDrawingState(combinedPath));
+	}
+	
+	protected void drawDrawing(){
+		runThread(new DrawingFiguresThread(this));
+	}
+	
+	public void drawDrawingReal(){
+		drawFigures();
+		updateLayout();
+		drawLines();
+//		graphicsFrame.setCurrentPaths(getCurrentPaths());
+		graphicsFrame.updateGUI();
+	}
+	
+	public void drawFigures(){
+		NewDrawingState state = getCurrentState();
+		ArrayList<String> paths = state.getPaths();
+		for (String path : paths) {
+			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
+			for (BaseFigure figure : figures) {
+				drawing.add(figure);
+			}
+		}
 	}
 
 	protected void addFigure(String parentPath, AbstractDTO dto) {

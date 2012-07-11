@@ -70,11 +70,10 @@ public class AnalysedController extends DrawingController {
 		for (AbstractDTO dto : modules) {
 			addFigure("", dto);
 		}
-		resetCurrentPaths();
 		if (DrawingDetail.WITH_VIOLATIONS == detail) {
 			showViolations();
 		}
-		drawModulesAndLines(modules);
+		drawDrawing();
 	}
 
 	@Override
@@ -101,7 +100,6 @@ public class AnalysedController extends DrawingController {
 	@Override
 	public void moduleZoom(BaseFigure[] figures) {
 		super.notifyServiceListeners();
-		resetContextFigures();
 		ArrayList<String> parentNames = new ArrayList<String>();
 		ArrayList<BaseFigure> parentFigures = new ArrayList<BaseFigure>();
 		for (BaseFigure figure : figures) {

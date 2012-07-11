@@ -12,7 +12,7 @@ public class DrawingLinesThread implements Runnable {
 
 	@Override
 	public void run() {
-		controller.drawLinesBasedOnSetting();
+		controller.drawLines();
 	}
 
 }
