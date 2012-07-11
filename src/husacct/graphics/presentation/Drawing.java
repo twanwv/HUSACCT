@@ -7,7 +7,6 @@ import husacct.graphics.presentation.figures.RelationFigure;
 import husacct.graphics.presentation.linelayoutstrategies.ConnectorLineSeparationStrategy;
 import husacct.graphics.presentation.linelayoutstrategies.ILineSeparationStrategy;
 import husacct.graphics.task.layout.FigureConnectorStrategy;
-import husacct.graphics.util.FigureMap;
 import husacct.graphics.util.register.NewDrawingState;
 
 import java.awt.geom.Point2D;
@@ -35,7 +34,6 @@ public class Drawing extends QuadTreeDrawing {
 	private FileManager filemanager = new FileManager();
 	private File selectedFile = filemanager.getFile();
 	private NewDrawingState drawingState;
-	private FigureMap olFigureMap;
 	private FigureConnectorStrategy connectionStrategy;
 
 	public Drawing() {
@@ -48,11 +46,6 @@ public class Drawing extends QuadTreeDrawing {
 		drawingState = state;
 	}
 	
-	@Deprecated
-	public void setFigureMap(FigureMap map) {
-		olFigureMap = map;
-	}
-
 	public void showExportToImagePanel() {
 		try {
 			ImageOutputFormat imageoutputformat = new ImageOutputFormat();

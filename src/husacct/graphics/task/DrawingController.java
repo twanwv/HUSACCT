@@ -82,7 +82,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	private void initializeComponents() {
 		drawing = new Drawing();
-		drawing.setFigureMap(figureMap);
 		drawingView = new DrawingView(drawing);
 		drawingView.addListener(this);
 
