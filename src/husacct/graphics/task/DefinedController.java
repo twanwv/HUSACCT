@@ -144,10 +144,11 @@ public class DefinedController extends DrawingController {
 	}
 
 	@Override
-	protected ViolationDTO[] getViolationsBetween(BaseFigure figureFrom, BaseFigure figureTo) {
-		ModuleDTO dtoFrom = (ModuleDTO) getFigureMap().getModuleDTO(figureFrom);
-		ModuleDTO dtoTo = (ModuleDTO) getFigureMap().getModuleDTO(figureTo);
-		return validateService.getViolationsByLogicalPath(dtoFrom.logicalPath, dtoTo.logicalPath);
+	protected ViolationDTO[] getViolationsBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo) {
+		return new ViolationDTO[] {};
+//		ModuleDTO dtoFrom = (ModuleDTO) getFigureMap().getModuleDTO(figureFrom);
+//		ModuleDTO dtoTo = (ModuleDTO) getFigureMap().getModuleDTO(figureTo);
+//		return validateService.getViolationsByLogicalPath(dtoFrom.logicalPath, dtoTo.logicalPath);
 	}
 
 	private void getAndDrawModulesIn(String parentName) {

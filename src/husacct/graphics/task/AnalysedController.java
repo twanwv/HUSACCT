@@ -5,6 +5,7 @@ import husacct.analyse.IAnalyseService;
 import husacct.common.dto.AbstractDTO;
 import husacct.common.dto.AnalysedModuleDTO;
 import husacct.common.dto.DependencyDTO;
+import husacct.common.dto.ModuleDTO;
 import husacct.common.dto.ViolationDTO;
 import husacct.common.services.IServiceListener;
 import husacct.graphics.presentation.figures.BaseFigure;
@@ -74,23 +75,6 @@ public class AnalysedController extends DrawingController {
 	}
 
 	@Override
-	protected DependencyDTO[] getDependenciesBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo) {
-		try {
-			return analyseService.getDependencies(((AnalysedModuleDTO) dtoFrom).uniqueName, ((AnalysedModuleDTO) dtoTo).uniqueName);
-		} catch (Exception e) {
-			logger.error("Could not fetch dependency between two modules.", e);
-		}
-		return new DependencyDTO[] {};
-	}
-
-	@Override
-	protected ViolationDTO[] getViolationsBetween(BaseFigure figureFrom, BaseFigure figureTo) {
-		AnalysedModuleDTO dtoFrom = (AnalysedModuleDTO) getFigureMap().getModuleDTO(figureFrom);
-		AnalysedModuleDTO dtoTo = (AnalysedModuleDTO) getFigureMap().getModuleDTO(figureTo);
-		return validateService.getViolationsByPhysicalPath(dtoFrom.uniqueName, dtoTo.uniqueName);
-	}
-
-	@Override
 	public void moduleZoom(BaseFigure[] figures) {
 		super.notifyServiceListeners();
 		ArrayList<BaseFigure> analysedContextFigures = new ArrayList<BaseFigure>();
@@ -105,6 +89,7 @@ public class AnalysedController extends DrawingController {
 				}
 			} else if (!figure.isLine()) {
 				logger.warn("Could not zoom on this object: " + figure.getName() + ". Not a module to zoom on. Figure is accepted as context for multizoom.");
+				analysedContextFigures.add(figure);
 			} else {
 				logger.warn("Could not zoom on this object: " + figure.getName() + ". Not a module to zoom on.");
 			}
@@ -179,5 +164,25 @@ public class AnalysedController extends DrawingController {
 		} else {
 			getModulesIn((ArrayList<String>) Arrays.asList(paths));
 		}
+	}
+	
+	@Override
+	protected DependencyDTO[] getDependenciesBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo) {
+		try {
+			return analyseService.getDependencies(((AnalysedModuleDTO) dtoFrom).uniqueName, ((AnalysedModuleDTO) dtoTo).uniqueName);
+		} catch (Exception e) {
+			logger.error("Could not fetch dependency between two modules.", e);
+		}
+		return new DependencyDTO[] {};
+	}
+
+	@Override
+	protected ViolationDTO[] getViolationsBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo) {
+		try {
+			return validateService.getViolationsByPhysicalPath(((AnalysedModuleDTO)dtoFrom).uniqueName, ((AnalysedModuleDTO)dtoTo).uniqueName);
+		} catch (Exception e) {
+			logger.error("Could not fetch violations between two modules.", e);
+		}
+		return new ViolationDTO[] {};
 	}
 }

@@ -243,33 +243,34 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public void drawLines() {
 		if (areDependenciesShown()) {
-			drawDependenciesForShownModules();
+			drawDependencies();
 		}
 		if (areViolationsShown()) {
-			drawViolationsForShownModules();
+			drawViolations();
 		}
 		if (areSmartLinesOn()) {
 			drawing.updateLineFigureToContext();
 		}
 	}
 
-	public void drawDependenciesForShownModules() {
+	public void drawDependencies() {
 		NewDrawingState state = getCurrentState();
 		ArrayList<String> paths = state.getPaths();
 		for (String path : paths) {
 			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
 			for (BaseFigure figureFrom : figures) {
 				for (BaseFigure figureTo : figures) {
-					getAndDrawDependenciesBetween(figureFrom, figureTo);
+					drawDependenciesBetween(figureFrom, figureTo);
 				}
 			}
 		}
 	}
 
-	private void getAndDrawDependenciesBetween(BaseFigure figureFrom, BaseFigure figureTo) {
+	private void drawDependenciesBetween(BaseFigure figureFrom, BaseFigure figureTo) {
 		if (!figureFrom.equals(figureTo)) {
-			AbstractDTO dtoFrom = getCurrentState().getFigureDTO(figureFrom);
-			AbstractDTO dtoTo = getCurrentState().getFigureDTO(figureTo);
+			NewDrawingState state = getCurrentState();
+			AbstractDTO dtoFrom = state.getFigureDTO(figureFrom);
+			AbstractDTO dtoTo = state.getFigureDTO(figureTo);
 			DependencyDTO[] dependencies = getDependenciesBetween(dtoFrom, dtoTo);
 			if (dependencies.length > 0) {
 				addDependency(dependencies, figureFrom, figureTo);
@@ -279,55 +280,50 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	protected abstract DependencyDTO[] getDependenciesBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo);
 
-	public void drawViolationsForShownModules() {
-		BaseFigure[] shownModules = drawing.getShownModules();
-		for (BaseFigure figureFrom : shownModules) {
-			for (BaseFigure figureTo : shownModules) {
-				if (figureFrom == figureTo) {
-					getAndDrawViolationsIn(figureFrom);
-				} else {
-					getAndDrawViolationsBetween(figureFrom, figureTo);
+	public void drawViolations() {
+		NewDrawingState state = getCurrentState();
+		ArrayList<String> paths = state.getPaths();
+		for (String path : paths) {
+			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
+			for (BaseFigure figureFrom : figures) {
+				for (BaseFigure figureTo : figures) {
+					if (figureFrom == figureTo) {
+						getAndDrawViolationsIn(figureFrom);
+					} else {
+						drawViolationsBetween(figureFrom, figureTo);
+					}
 				}
 			}
 		}
 	}
 
 	private void getAndDrawViolationsIn(BaseFigure figureFrom) {
-		ViolationDTO[] violations = getViolationsBetween(figureFrom, figureFrom);
-		if (violations.length > 0) {
-			drawViolationsIn(violations, figureFrom);
-		}
+//		ViolationDTO[] violations = getViolationsBetween(figureFrom, figureFrom);
+//		if (violations.length > 0) {
+//			drawViolationsIn(violations, figureFrom);
+//		}
 	}
 
 	public void drawViolationsIn(ViolationDTO[] violations, BaseFigure figureFrom) {
-		try {
-			figureFrom.addDecorator(figureFactory.createViolationsDecorator(violations));
-		} catch (Exception e) {
-			logger.error("Could not attach decorator to figure to indicate internal violations.", e);
-		}
-		figureMap.linkViolatedModule(figureFrom, violations);
+//		try {
+//			figureFrom.addDecorator(figureFactory.createViolationsDecorator(violations));
+//		} catch (Exception e) {
+//			logger.error("Could not attach decorator to figure to indicate internal violations.", e);
+//		}
+//		figureMap.linkViolatedModule(figureFrom, violations);
 	}
 
-	private void getAndDrawViolationsBetween(BaseFigure figureFrom, BaseFigure figureTo) {
-		ViolationDTO[] violations = getViolationsBetween(figureFrom, figureTo);
+	private void drawViolationsBetween(BaseFigure figureFrom, BaseFigure figureTo) {
+		NewDrawingState state = getCurrentState();
+		AbstractDTO dtoFrom = state.getFigureDTO(figureFrom);
+		AbstractDTO dtoTo = state.getFigureDTO(figureTo);
+		ViolationDTO[] violations = getViolationsBetween(dtoFrom, dtoTo);
 		if (violations.length > 0) {
-			drawViolationsBetween(violations, figureFrom, figureTo);
+			addViolation(violations, figureFrom, figureTo);
 		}
 	}
 
-	public void drawViolationsBetween(ViolationDTO[] violations, BaseFigure figureFrom, BaseFigure figureTo) {
-		try {
-			RelationFigure violationFigure = figureFactory.createFigure(violations);
-			figureMap.linkViolations(violationFigure, violations);
-			// connectionStrategy.connect(violationFigure, figureFrom,
-			// figureTo);
-			drawing.add(violationFigure);
-		} catch (Exception e) {
-			logger.error("Could not create a violation line between figures.", e);
-		}
-	}
-
-	protected abstract ViolationDTO[] getViolationsBetween(BaseFigure figureFrom, BaseFigure figureTo);
+	protected abstract ViolationDTO[] getViolationsBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo);
 
 	public abstract void refreshDrawing();
 

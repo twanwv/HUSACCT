@@ -55,7 +55,7 @@ public class DrawingControllerTest extends DrawingController {
 	}
 
 	@Override
-	protected ViolationDTO[] getViolationsBetween(BaseFigure figureFrom, BaseFigure figureTo) {
+	protected ViolationDTO[] getViolationsBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo) {
 		return null;
 	}
 
