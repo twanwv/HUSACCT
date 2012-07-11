@@ -3,6 +3,8 @@ package husacct.graphics.util.register;
 import husacct.common.dto.AbstractDTO;
 import husacct.graphics.presentation.figures.BaseFigure;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class NewFigureMap {
@@ -23,5 +25,9 @@ public class NewFigureMap {
 
 	public AbstractDTO getFigureDTO(BaseFigure figure) {
 		return figureDTOMap.get(figure);
+	}
+
+	public ArrayList<BaseFigure> getFigures() {
+		return new ArrayList<BaseFigure>(figureDTOMap.keySet());
 	}
 }

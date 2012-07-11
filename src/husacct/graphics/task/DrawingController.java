@@ -2,7 +2,9 @@ package husacct.graphics.task;
 
 import husacct.ServiceProvider;
 import husacct.common.dto.AbstractDTO;
+import husacct.common.dto.AnalysedModuleDTO;
 import husacct.common.dto.DependencyDTO;
+import husacct.common.dto.ModuleDTO;
 import husacct.common.dto.ViolationDTO;
 import husacct.common.locale.ILocaleService;
 import husacct.common.services.IServiceListener;
@@ -22,6 +24,8 @@ import husacct.graphics.task.layout.NoLayoutStrategy;
 import husacct.graphics.util.DrawingDetail;
 import husacct.graphics.util.DrawingLayoutStrategy;
 import husacct.graphics.util.FigureMap;
+import husacct.graphics.util.register.DrawingRegister;
+import husacct.graphics.util.register.NewDrawingState;
 import husacct.graphics.util.threads.DrawingLinesThread;
 import husacct.graphics.util.threads.DrawingMultiLevelThread;
 import husacct.graphics.util.threads.DrawingSingleLevelThread;
@@ -233,13 +237,12 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	public void drawSingleLevelModules(AbstractDTO[] modules) {
-		for (AbstractDTO dto : modules) {
-			try {
-				BaseFigure generatedFigure = figureFactory.createFigure(dto);
-				drawing.add(generatedFigure);
-				figureMap.linkModule(generatedFigure, dto);
-			} catch (Exception e) {
-				logger.error("Could not generate and display figure.", e);
+		NewDrawingState state = getCurrentState();
+		ArrayList<String> paths = state.getPaths();
+		for(String path : paths){
+			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
+			for(BaseFigure figure : figures){
+				drawing.add(figure);
 			}
 		}
 	}
@@ -503,5 +506,38 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public boolean isDrawingVisible() {
 		return drawingView.isVisible();
+	}
+
+	DrawingRegister register = new DrawingRegister();
+
+	protected NewDrawingState getCurrentState() {
+		return register.getCurrentState();
+	}
+
+	protected void createState(String combinedPath) {
+		register.addState(new NewDrawingState(combinedPath));
+	}
+
+	protected void addFigure(String parentPath, AbstractDTO dto) {
+		try {
+			BaseFigure figure = figureFactory.createFigure(dto);
+			getCurrentState().addFigure(parentPath, figure, dto);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	protected String createCombinedPathHelper(ArrayList<BaseFigure> figures) {
+		String s = "";
+		for (BaseFigure figure : figures) {
+			AbstractDTO dto = getCurrentState().getFigureDTO(figure);
+			if (dto instanceof ModuleDTO) {
+				s += ((ModuleDTO) dto).logicalPath + "+";
+			} else if (dto instanceof AnalysedModuleDTO) {
+				s += ((AnalysedModuleDTO) dto).uniqueName + "+";
+			}
+			System.err.println(s);
+		}
+		return s;
 	}
 }

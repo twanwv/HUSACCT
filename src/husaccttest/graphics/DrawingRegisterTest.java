@@ -86,8 +86,45 @@ public class DrawingRegisterTest {
 		createRootState();
 		NewDrawingState state = register.getCurrentState();
 		BaseFigure figure = new ModuleFigure("name", "type");
-		state.addFigure("domain", figure, new AbstractDTO());
+		AbstractDTO dto = new AbstractDTO();
+		state.addFigure("domain", figure, dto);
 		assertNotNull(state.getFigureDTO(figure));
+		assertEquals(dto, state.getFigureDTO(figure));
+	}
+	
+	@Test
+	public void returnPaths() {
+		createRootState();
+		NewDrawingState state = register.getCurrentState();
+		BaseFigure figureOne = new ModuleFigure("name", "type");
+		AbstractDTO dtoOne = new AbstractDTO();
+		state.addFigure("domain", figureOne, dtoOne);
+		
+		BaseFigure figureTwo = new ModuleFigure("name", "type");
+		AbstractDTO dtoTwo = new AbstractDTO();
+		state.addFigure("presentation", figureTwo, dtoTwo);
+		
+		assertEquals(2, state.getPaths().size());
+	}
+	
+	@Test
+	public void returnFigures() {
+		createRootState();
+		NewDrawingState state = register.getCurrentState();
+		BaseFigure figureOne = new ModuleFigure("name", "type");
+		AbstractDTO dtoOne = new AbstractDTO();
+		state.addFigure("domain", figureOne, dtoOne);
+		
+		BaseFigure figureTwo = new ModuleFigure("name", "type");
+		AbstractDTO dtoTwo = new AbstractDTO();
+		state.addFigure("presentation", figureTwo, dtoTwo);
+		
+		BaseFigure figureThree = new ModuleFigure("name", "type");
+		AbstractDTO dtoThree = new AbstractDTO();
+		state.addFigure("presentation", figureThree, dtoThree);
+		
+		assertEquals(1, state.getFiguresByPath("domain").size());
+		assertEquals(2, state.getFiguresByPath("presentation").size());
 	}
 
 	@Test

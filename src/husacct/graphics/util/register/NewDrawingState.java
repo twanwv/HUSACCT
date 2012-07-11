@@ -5,6 +5,7 @@ import husacct.common.dto.AnalysedModuleDTO;
 import husacct.common.dto.ModuleDTO;
 import husacct.graphics.presentation.figures.BaseFigure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class NewDrawingState {
@@ -78,5 +79,14 @@ public class NewDrawingState {
 			}
 			addFigure(path, contextFigure, contextDTO);
 		}
+	}
+	
+	public ArrayList<String> getPaths() {
+		return new ArrayList<String>(paths.keySet());
+	}
+
+	public ArrayList<BaseFigure> getFiguresByPath(String path) {
+		NewFigureMap pathMap = paths.get(path);
+		return pathMap.getFigures();
 	}
 }
