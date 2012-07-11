@@ -62,15 +62,11 @@ public class AnalysedController extends DrawingController {
 	public void drawArchitecture(DrawingDetail detail) {
 		super.drawArchitecture(getCurrentDrawingDetail());
 		super.notifyServiceListeners();
-		// TODO use drawIn()
-		AbstractDTO[] modules = analyseService.getRootModules();
 		createState("");
-		for (AbstractDTO dto : modules) {
-			addFigure("", dto);
-		}
 		if (DrawingDetail.WITH_VIOLATIONS == detail) {
 			showViolations();
 		}
+		getModulesIn(new ArrayList<String>());
 		drawDrawing();
 	}
 
@@ -93,8 +89,8 @@ public class AnalysedController extends DrawingController {
 
 	@Override
 	public void moduleZoom(BaseFigure[] figures) {
-		ArrayList<BaseFigure> analysedContextFigures = new ArrayList<BaseFigure>();
 		super.notifyServiceListeners();
+		ArrayList<BaseFigure> analysedContextFigures = new ArrayList<BaseFigure>();
 		ArrayList<BaseFigure> parentFigures = new ArrayList<BaseFigure>();
 		for (BaseFigure figure : figures) {
 			if (figure.isModule()) {
@@ -132,7 +128,7 @@ public class AnalysedController extends DrawingController {
 			ArrayList<String> parentNames = new ArrayList<String>();
 			for (String path : currentPaths) {
 				AnalysedModuleDTO parentDTO = analyseService.getParentModuleForModule(path);
-				if(!parentNames.contains(parentDTO.uniqueName)){
+				if (!parentNames.contains(parentDTO.uniqueName)) {
 					parentNames.add(parentDTO.uniqueName);
 				}
 			}
@@ -151,22 +147,24 @@ public class AnalysedController extends DrawingController {
 	}
 
 	private void getModulesIn(ArrayList<String> parentNames) {
-		if (parentNames.size() == 0) {
-			drawArchitecture(getCurrentDrawingDetail());
+		if (parentNames.size() == 0 || (parentNames.size()==1 && parentNames.get(0).isEmpty())) {
+			AbstractDTO[] children = analyseService.getRootModules();
+			addChildFigures("", children);
 		} else {
 			for (String parentName : parentNames) {
 				AbstractDTO[] children = analyseService.getChildModulesInModule(parentName);
-				if (parentName.equals("")) {
-					drawArchitecture(getCurrentDrawingDetail());
-					continue;
-				} else if (children.length > 0) {
-					for (AbstractDTO child : children) {
-						addFigure(parentName, child);
-					}
-				} else {
-					logger.warn("Tried to draw modules for \"" + parentName + "\", but it has no children.");
-				}
+				addChildFigures(parentName, children);
 			}
+		}
+	}
+
+	private void addChildFigures(String parentName, AbstractDTO[] children) {
+		if (null != children) {
+			for (AbstractDTO child : children) {
+				addFigure(parentName, child);
+			}
+		} else {
+			logger.warn("Tried to draw modules for \"" + parentName + "\", but it has no children.");
 		}
 	}
 
