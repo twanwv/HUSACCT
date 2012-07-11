@@ -15,15 +15,17 @@ public class NewDrawingState {
 	private NewDrawingState parentState;
 	private String fullPath;
 	private HashMap<String, NewFigureMap> paths;
-	private HashMap<RelationFigure, AbstractDTO[]> dependencyDTOMap;
-	private HashMap<RelationFigure, AbstractDTO[]> violationDTOMap;
+	private HashMap<RelationFigure, DependencyDTO[]> dependencyDTOMap;
+	private HashMap<RelationFigure, ViolationDTO[]> violationDTOMap;
 	private HashMap<BaseFigure, Double> figurePositions;
+	
+	private int maxDependencies, maxViolations, maxAll;
 	
 	public NewDrawingState(String path){
 		fullPath = path;
 		paths = new HashMap<String, NewFigureMap>();
-		dependencyDTOMap = new HashMap<RelationFigure, AbstractDTO[]>(); 
-		violationDTOMap = new HashMap<RelationFigure, AbstractDTO[]>();
+		dependencyDTOMap = new HashMap<RelationFigure, DependencyDTO[]>(); 
+		violationDTOMap = new HashMap<RelationFigure, ViolationDTO[]>();
 	}
 	
 	public void setParentState(NewDrawingState state){
@@ -99,18 +101,50 @@ public class NewDrawingState {
 	}
 
 	public void addDependency(RelationFigure relationFigure, DependencyDTO[] dtos) {
+		setMaxDependencies(dtos.length);
 		dependencyDTOMap.put(relationFigure, dtos);
 	}
 
-	public Object getDependencyDTOs(RelationFigure relationFigure) {
+	public DependencyDTO[] getDependencyDTOs(RelationFigure relationFigure) {
 		return dependencyDTOMap.get(relationFigure);
 	}
 
 	public void addViolation(RelationFigure relationFigure, ViolationDTO[] dtos) {
+		setMaxViolations(dtos.length);
 		violationDTOMap.put(relationFigure, dtos);
 	}
 	
-	public Object getViolationDTOs(RelationFigure relationFigure) {
+	public ViolationDTO[] getViolationDTOs(RelationFigure relationFigure) {
 		return violationDTOMap.get(relationFigure);
+	}
+	
+	private void setMaxDependencies(int newMax){
+		if(newMax > maxDependencies){
+			maxDependencies = newMax;
+		}
+		if(newMax > maxAll){
+			maxAll = newMax;
+		}
+	}
+	
+	public int getMaxDependencies(){
+		return maxDependencies;
+	}
+	
+	private void setMaxViolations(int newMax){
+		if(newMax > maxViolations){
+			maxViolations = newMax;
+		}
+		if(newMax > maxAll){
+			maxAll = newMax;
+		}
+	}
+	
+	public int getMaxViolations(){
+		return maxViolations;
+	}
+	
+	public int getMaxAll(){
+		return maxAll;
 	}
 }

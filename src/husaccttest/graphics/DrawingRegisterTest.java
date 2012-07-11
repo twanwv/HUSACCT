@@ -1,8 +1,6 @@
 package husaccttest.graphics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.awt.Color;
 
@@ -126,7 +124,23 @@ public class DrawingRegisterTest {
 		RelationFigure dependencyFigure = factory.createFigure(dtos);
 		state.addDependency(dependencyFigure, dtos);
 		assertNotNull(state.getDependencyDTOs(dependencyFigure));
-		assertEquals(dtos, state.getDependencyDTOs(dependencyFigure));
+		assertArrayEquals(dtos, state.getDependencyDTOs(dependencyFigure));
+	}
+
+	@Test
+	public void maxDependenciesCountUpdated() {
+		createRootState();
+		NewDrawingState state = register.getCurrentState();
+		
+		DependencyDTO[] dtosCollectionOne = new DependencyDTO[]{ new DependencyDTO("domain", "presentation", "import", false, 1)};
+		RelationFigure dependencyFigureOne = factory.createFigure(dtosCollectionOne);
+		state.addDependency(dependencyFigureOne, dtosCollectionOne);		
+		assertEquals(1, state.getMaxDependencies());
+		
+		DependencyDTO[] dtosCollectionTwo = new DependencyDTO[]{ new DependencyDTO("domain", "presentation", "import", false, 1), new DependencyDTO("domain", "presentation", "import", false, 2) };
+		RelationFigure dependencyFigureTwo = factory.createFigure(dtosCollectionTwo);
+		state.addDependency(dependencyFigureTwo, dtosCollectionTwo);			
+		assertEquals(2, state.getMaxDependencies());
 	}
 	
 	@Test
@@ -137,7 +151,45 @@ public class DrawingRegisterTest {
 		RelationFigure violationFigure = factory.createFigure(dtos);
 		state.addViolation(violationFigure, dtos);
 		assertNotNull(state.getViolationDTOs(violationFigure));
-		assertEquals(dtos, state.getViolationDTOs(violationFigure));
+		assertArrayEquals(dtos, state.getViolationDTOs(violationFigure));
+	}
+	
+	@Test
+	public void maxViolationsCountUpdated() {
+		createRootState();
+		NewDrawingState state = register.getCurrentState();
+		
+		ViolationDTO[] dtosCollectionOne = new ViolationDTO[]{ new ViolationDTO("domain", "presentation", "domain", "presentation", new ViolationTypeDTO("import", "importDescription", true), null, "Violation between domain and presentation", 1, Color.red, "High", 3, false) };
+		RelationFigure violationFigureOne = factory.createFigure(dtosCollectionOne);
+		state.addViolation(violationFigureOne, dtosCollectionOne);		
+		assertEquals(1, state.getMaxViolations());
+		
+		ViolationDTO[] dtosCollectionTwo = new ViolationDTO[]{ new ViolationDTO("domain", "presentation", "domain", "presentation", new ViolationTypeDTO("import", "importDescription", true), null, "Violation between domain and presentation", 1, Color.red, "High", 3, false), new ViolationDTO("domain", "presentation", "domain", "presentation", new ViolationTypeDTO("import", "importDescription", true), null, "Violation between domain and presentation", 2, Color.red, "High", 3, false) };
+		RelationFigure violationFigureTwo = factory.createFigure(dtosCollectionTwo);
+		state.addViolation(violationFigureTwo, dtosCollectionTwo);			
+		assertEquals(2, state.getMaxViolations());
+	}
+	
+
+	@Test
+	public void maxAllCountUpdated() {
+		createRootState();
+		NewDrawingState state = register.getCurrentState();
+		
+		DependencyDTO[] dtosCollectionOne = new DependencyDTO[]{ new DependencyDTO("domain", "presentation", "import", false, 1)};
+		RelationFigure dependencyFigureOne = factory.createFigure(dtosCollectionOne);
+		state.addDependency(dependencyFigureOne, dtosCollectionOne);		
+		assertEquals(1, state.getMaxDependencies());
+		
+		ViolationDTO[] dtosCollectionTwo = new ViolationDTO[]{ new ViolationDTO("domain", "presentation", "domain", "presentation", new ViolationTypeDTO("import", "importDescription", true), null, "Violation between domain and presentation", 1, Color.red, "High", 3, false), new ViolationDTO("domain", "presentation", "domain", "presentation", new ViolationTypeDTO("import", "importDescription", true), null, "Violation between domain and presentation", 2, Color.red, "High", 3, false) };
+		RelationFigure violationFigureTwo = factory.createFigure(dtosCollectionTwo);
+		state.addViolation(violationFigureTwo, dtosCollectionTwo);			
+		assertEquals(2, state.getMaxViolations());
+		
+		DependencyDTO[] dtosCollectionThree = new DependencyDTO[]{ new DependencyDTO("domain", "presentation", "import", false, 1), new DependencyDTO("domain", "presentation", "import", false, 2), new DependencyDTO("domain", "presentation", "import", false, 3), new DependencyDTO("domain", "presentation", "import", false, 4)};
+		RelationFigure dependencyFigureThree = factory.createFigure(dtosCollectionThree);
+		state.addDependency(dependencyFigureThree, dtosCollectionThree);			
+		assertEquals(4, state.getMaxDependencies());
 	}
 
 	@Test
@@ -174,7 +226,7 @@ public class DrawingRegisterTest {
 		assertEquals(1, state.getFiguresByPath("domain").size());
 		assertEquals(2, state.getFiguresByPath("presentation").size());
 	}
-
+	
 	@Test
 	public void emp() {
 

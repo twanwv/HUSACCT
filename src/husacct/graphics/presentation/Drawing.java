@@ -6,7 +6,9 @@ import husacct.graphics.presentation.figures.BaseFigure;
 import husacct.graphics.presentation.figures.RelationFigure;
 import husacct.graphics.presentation.linelayoutstrategies.ConnectorLineSeparationStrategy;
 import husacct.graphics.presentation.linelayoutstrategies.ILineSeparationStrategy;
+import husacct.graphics.task.layout.FigureConnectorStrategy;
 import husacct.graphics.util.FigureMap;
+import husacct.graphics.util.register.NewDrawingState;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -32,15 +34,23 @@ public class Drawing extends QuadTreeDrawing {
 	private Logger logger = Logger.getLogger(Drawing.class);
 	private FileManager filemanager = new FileManager();
 	private File selectedFile = filemanager.getFile();
-	private FigureMap figureMap;
+	private NewDrawingState drawingState;
+	private FigureMap olFigureMap;
+	private FigureConnectorStrategy connectionStrategy;
 
 	public Drawing() {
 		super();
+		connectionStrategy = new FigureConnectorStrategy();
 		hiddenFigures = new ArrayList<BaseFigure>();
 	}
 	
+	public void setState(NewDrawingState state) {
+		drawingState = state;
+	}
+	
+	@Deprecated
 	public void setFigureMap(FigureMap map) {
-		figureMap = map;
+		olFigureMap = map;
 	}
 
 	public void showExportToImagePanel() {
@@ -91,6 +101,11 @@ public class Drawing extends QuadTreeDrawing {
 		// This triggers the minimum sizes
 		figure.setBounds(new Point2D.Double(10, 10), new Point2D.Double(11, 11));
 		return super.add(figure);
+	}
+	
+	public boolean addRelation(RelationFigure relationFigure, BaseFigure figureFrom, BaseFigure figureTo){
+		connectionStrategy.connect(relationFigure, figureFrom, figureTo);
+		return add(relationFigure);
 	}
 
 	public void setFiguresNotViolated(ArrayList<BaseFigure> arrayList) {
@@ -162,7 +177,7 @@ public class Drawing extends QuadTreeDrawing {
 	}
 
 	private void updateLineFigureThicknesses(RelationFigure[] figures) {
-		int maxAmount = figureMap.getMaxAll();
+		int maxAmount = drawingState.getMaxAll();
 		for (RelationFigure figure : figures) {
 			double weight = (double) figure.getAmount() / maxAmount;
 			if (weight < 0.25) {

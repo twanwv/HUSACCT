@@ -56,7 +56,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected Logger logger = Logger.getLogger(DrawingController.class);
 
 	private FigureFactory figureFactory;
-	private FigureConnectorStrategy connectionStrategy;
 	private LayoutStrategy layoutStrategy;
 
 	protected ThreadMonitor threadMonitor;
@@ -67,7 +66,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 		layoutStrategyOption = DrawingLayoutStrategy.BASIC_LAYOUT;
 
 		figureFactory = new FigureFactory();
-		connectionStrategy = new FigureConnectorStrategy();
 
 		localeService = ServiceProvider.getInstance().getLocaleService();
 		localeService.addServiceListener(new IServiceListener() {
@@ -179,6 +177,8 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 		drawingView.clearSelection();
 		drawingView.invalidate();
+		
+		drawing.setState(getCurrentState());
 	}
 
 	public void clearLines() {
@@ -256,7 +256,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	public void drawMultiLevel(HashMap<String, ArrayList<AbstractDTO>> modules) {
-		clearDrawing();
 		drawMultiLevelModules(modules);
 		updateLayout();
 		drawLinesBasedOnSetting();
@@ -361,7 +360,8 @@ public abstract class DrawingController extends DrawingSettingsController {
 		}
 		if (null != dependencyFigure) {
 			figureMap.linkDependencies(dependencyFigure, dependencies);
-			connectionStrategy.connect(dependencyFigure, figureFrom, figureTo);
+			// connectionStrategy.connect(dependencyFigure, figureFrom,
+			// figureTo);
 			drawing.add(dependencyFigure);
 		}
 	}
@@ -408,7 +408,8 @@ public abstract class DrawingController extends DrawingSettingsController {
 		try {
 			RelationFigure violationFigure = figureFactory.createFigure(violations);
 			figureMap.linkViolations(violationFigure, violations);
-			connectionStrategy.connect(violationFigure, figureFrom, figureTo);
+			// connectionStrategy.connect(violationFigure, figureFrom,
+			// figureTo);
 			drawing.add(violationFigure);
 		} catch (Exception e) {
 			logger.error("Could not create a violation line between figures.", e);
@@ -540,19 +541,17 @@ public abstract class DrawingController extends DrawingSettingsController {
 		try {
 			RelationFigure dependencyFigure = figureFactory.createFigure(dependencyDTOs);
 			getCurrentState().addDependency(dependencyFigure, dependencyDTOs);
-			connectionStrategy.connect(dependencyFigure, figureFrom, figureTo);
-			drawing.add(dependencyFigure);
+			drawing.addRelation(dependencyFigure, figureFrom, figureTo);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 	}
 
-	protected void addViolation(ViolationDTO[] violationDTOs) {
+	protected void addViolation(ViolationDTO[] violationDTOs, BaseFigure figureFrom, BaseFigure figureTo) {
 		try {
 			RelationFigure violationFigure = figureFactory.createFigure(violationDTOs);
 			getCurrentState().addViolation(violationFigure, violationDTOs);
-			// connectionStrategy.connect(dependencyFigure, figureFrom,
-			// figureTo); //for violation
+			drawing.addRelation(violationFigure, figureFrom, figureTo);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
