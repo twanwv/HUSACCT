@@ -49,7 +49,7 @@ public class AnalysedController extends DrawingController {
 	public void refreshDrawing() {
 		super.notifyServiceListeners();
 		ArrayList<String> currentPaths = getCurrentState().getPaths();
-		createState(createCombinedPathHelper(currentPaths));
+		createState(currentPaths);
 		getModulesIn(currentPaths);
 		drawDrawing();
 	}
@@ -65,7 +65,7 @@ public class AnalysedController extends DrawingController {
 	public void drawArchitecture(DrawingDetail detail) {
 		super.drawArchitecture(getCurrentDrawingDetail());
 		super.notifyServiceListeners();
-		createState("");
+		createState(new ArrayList<String>());
 		if (DrawingDetail.WITH_VIOLATIONS == detail) {
 			showViolations();
 		}
@@ -95,8 +95,7 @@ public class AnalysedController extends DrawingController {
 		}
 
 		ArrayList<String> parentNames = getParentNamesHelper(parentFigures);
-		String combinedPath = createCombinedPathHelper(parentNames);
-		createState(combinedPath);
+		createState(parentNames);
 		for (BaseFigure figure : analysedContextFigures) {
 			addContextFigure(figure);
 		}
@@ -119,8 +118,7 @@ public class AnalysedController extends DrawingController {
 					parentNames.add(parentDTO.uniqueName);
 				}
 			}
-			String combinedPath = createCombinedPathHelper(parentNames);
-			createState(combinedPath);
+			createState(parentNames);
 
 			if (parentNames.size() > 0) {
 				getModulesIn(parentNames);

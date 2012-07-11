@@ -21,6 +21,7 @@ import husacct.graphics.task.layout.LayoutStrategy;
 import husacct.graphics.task.layout.NoLayoutStrategy;
 import husacct.graphics.util.DrawingDetail;
 import husacct.graphics.util.DrawingLayoutStrategy;
+import husacct.graphics.util.helpers.PathHelper;
 import husacct.graphics.util.register.DrawingRegister;
 import husacct.graphics.util.register.NewDrawingState;
 import husacct.graphics.util.threads.DrawingFiguresThread;
@@ -89,8 +90,8 @@ public abstract class DrawingController extends DrawingSettingsController {
 		return register.getCurrentState();
 	}
 
-	protected void createState(String combinedPath) {
-		register.addState(new NewDrawingState(combinedPath));
+	protected void createState(ArrayList<String> paths) {
+		register.addState(new NewDrawingState(PathHelper.createCombinedPathHelper(paths)));
 	}
 
 	private void runThread(Runnable runnable) {
@@ -434,7 +435,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 			logger.error(e.getMessage());
 		}
 	}
-
+	
 	protected ArrayList<String> getParentNamesHelper(ArrayList<BaseFigure> figures) {
 		ArrayList<String> names = new ArrayList<String>();
 		for (BaseFigure figure : figures) {
@@ -446,18 +447,5 @@ public abstract class DrawingController extends DrawingSettingsController {
 			}
 		}
 		return names;
-	}
-
-	protected String createCombinedPathHelper(ArrayList<String> parents) {
-		String s = "";
-		for (String parent : parents) {
-			if (!parent.isEmpty()) {
-				s += parent + "+";
-			}
-		}
-		if (s.length() > 0) {
-			s = s.substring(0, s.length() - 1);
-		}
-		return s;
 	}
 }
