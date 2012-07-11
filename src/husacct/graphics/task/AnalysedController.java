@@ -48,7 +48,10 @@ public class AnalysedController extends DrawingController {
 	@Override
 	public void refreshDrawing() {
 		super.notifyServiceListeners();
-		// getAndDrawModulesIn(getCurrentPaths());
+		ArrayList<String> currentPaths = getCurrentState().getPaths();
+		createState(createCombinedPathHelper(currentPaths));
+		getModulesIn(currentPaths);
+		drawDrawing();
 	}
 
 	@Override
@@ -147,7 +150,7 @@ public class AnalysedController extends DrawingController {
 	}
 
 	private void getModulesIn(ArrayList<String> parentNames) {
-		if (parentNames.size() == 0 || (parentNames.size()==1 && parentNames.get(0).isEmpty())) {
+		if (parentNames.size() == 0 || (parentNames.size() == 1 && parentNames.get(0).isEmpty())) {
 			AbstractDTO[] children = analyseService.getRootModules();
 			addChildFigures("", children);
 		} else {
