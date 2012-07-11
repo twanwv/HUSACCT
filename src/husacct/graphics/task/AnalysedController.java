@@ -132,7 +132,9 @@ public class AnalysedController extends DrawingController {
 			ArrayList<String> parentNames = new ArrayList<String>();
 			for (String path : currentPaths) {
 				AnalysedModuleDTO parentDTO = analyseService.getParentModuleForModule(path);
-				parentNames.add(parentDTO.uniqueName);
+				if(!parentNames.contains(parentDTO.uniqueName)){
+					parentNames.add(parentDTO.uniqueName);
+				}
 			}
 			String combinedPath = createCombinedPathHelper(parentNames);
 			createState(combinedPath);
