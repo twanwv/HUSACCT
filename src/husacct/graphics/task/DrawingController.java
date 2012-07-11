@@ -24,7 +24,6 @@ import husacct.graphics.util.DrawingLayoutStrategy;
 import husacct.graphics.util.register.DrawingRegister;
 import husacct.graphics.util.register.NewDrawingState;
 import husacct.graphics.util.threads.DrawingFiguresThread;
-import husacct.graphics.util.threads.DrawingLinesThread;
 import husacct.graphics.util.threads.ThreadMonitor;
 
 import java.util.ArrayList;
@@ -65,7 +64,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		localeService.addServiceListener(new IServiceListener() {
 			@Override
 			public void update() {
-				refreshFrame();
+				graphicsFrame.refreshFrame();
 			}
 		});
 
@@ -85,17 +84,21 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 		threadMonitor = new ThreadMonitor(this);
 	}
+	
+	protected NewDrawingState getCurrentState() {
+		return register.getCurrentState();
+	}
+
+	protected void createState(String combinedPath) {
+		register.addState(new NewDrawingState(combinedPath));
+	}
 
 	private void runThread(Runnable runnable) {
+		// TODO: Move to thread monitor
 		if (!threadMonitor.add(runnable)) {
 			logger.warn("A drawing thread is already running. Wait until it has finished before running another.");
 			graphicsFrame.setOutOfDate();
 		}
-	}
-
-	@Deprecated
-	public Drawing getDrawing() {
-		return drawing;
 	}
 
 	private void switchLayoutStrategy() {
@@ -162,25 +165,9 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public void clearDrawing() {
 		drawing.clearAll();
-
 		drawingView.clearSelection();
 		drawingView.invalidate();
-
 		drawing.setState(getCurrentState());
-	}
-
-	public void clearLines() {
-		drawing.clearAllLines();
-	}
-
-	@Deprecated
-	public void setCurrentPaths(String[] paths) {
-		super.setCurrentPaths(paths);
-		if (!getCurrentPaths()[0].isEmpty()) {
-			drawingView.canZoomOut();
-		} else {
-			drawingView.cannotZoomOut();
-		}
 	}
 
 	@Override
@@ -207,10 +194,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 		}
 	}
 
-	public void drawArchitecture(DrawingDetail detail) {
-		drawingView.cannotZoomOut();
-	}
-
 	protected void updateLayout() {
 		String currentPaths = getCurrentState().getFullPath();
 
@@ -223,15 +206,44 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 		drawing.updateLines();
 	}
-
-	protected void drawLinesBasedOnSettingInTask() {
-		clearLines();
-		setDrawingViewNonVisible();
-		runDrawLinesTask();
+	
+	public void drawArchitecture(DrawingDetail detail) {
+		drawingView.cannotZoomOut();
+	}
+	
+	public abstract void refreshDrawing();
+	
+	protected void drawDrawing() {
+		runThread(new DrawingFiguresThread(this));
 	}
 
-	private void runDrawLinesTask() {
-		runThread(new DrawingLinesThread(this));
+	public void drawDrawingReal() {
+		drawFigures();
+		updateLayout();
+		drawLines();
+		//TODO: rewrite
+		// graphicsFrame.setCurrentPaths(getCurrentPaths());
+		graphicsFrame.updateGUI();
+	}
+
+	public void drawFigures() {
+		NewDrawingState state = getCurrentState();
+		ArrayList<String> paths = state.getPaths();
+		boolean mulipleParents = paths.size() > 1;
+		for (String path : paths) {
+			BaseFigure parentFigure = null;
+			if (mulipleParents) {
+				parentFigure = figureFactory.createParentFigure(path);
+				drawing.add(parentFigure);
+			}
+			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
+			for (BaseFigure figure : figures) {
+				drawing.add(figure);
+				if (mulipleParents) {
+					parentFigure.add(figure);
+				}
+			}
+		}
 	}
 
 	public void drawLines() {
@@ -297,12 +309,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	protected abstract ViolationDTO[] getViolationsBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo);
-
-	public abstract void refreshDrawing();
-
-	public void refreshFrame() {
-		graphicsFrame.refreshFrame();
-	}
 
 	@Override
 	public void exportToImage() {
@@ -384,46 +390,6 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public boolean isDrawingVisible() {
 		return drawingView.isVisible();
-	}
-
-	protected NewDrawingState getCurrentState() {
-		return register.getCurrentState();
-	}
-
-	protected void createState(String combinedPath) {
-		register.addState(new NewDrawingState(combinedPath));
-	}
-
-	protected void drawDrawing() {
-		runThread(new DrawingFiguresThread(this));
-	}
-
-	public void drawDrawingReal() {
-		drawFigures();
-		updateLayout();
-		drawLines();
-		// graphicsFrame.setCurrentPaths(getCurrentPaths());
-		graphicsFrame.updateGUI();
-	}
-
-	public void drawFigures() {
-		NewDrawingState state = getCurrentState();
-		ArrayList<String> paths = state.getPaths();
-		boolean mulipleParents = paths.size() > 1;
-		for (String path : paths) {
-			BaseFigure parentFigure = null;
-			if (mulipleParents) {
-				parentFigure = figureFactory.createParentFigure(path);
-				drawing.add(parentFigure);
-			}
-			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
-			for (BaseFigure figure : figures) {
-				drawing.add(figure);
-				if (mulipleParents) {
-					parentFigure.add(figure);
-				}
-			}
-		}
 	}
 
 	protected void addFigure(String parentPath, AbstractDTO dto) {

@@ -151,17 +151,17 @@ public class DefinedController extends DrawingController {
 	}
 
 	private void getAndDrawModulesIn(String parentName) {
-		if (parentName.equals("") || parentName.equals("**")) {
-			drawArchitecture(getCurrentDrawingDetail());
-		} else {
-			ModuleDTO[] children = defineService.getChildrenFromModule(parentName);
-			if (children.length > 0) {
-				setCurrentPaths(new String[] { parentName });
-				//drawModulesAndLines(children);
-			} else {
-				logger.warn("Tried to draw modules for \"" + parentName + "\", but it has no children.");
-			}
-		}
+//		if (parentName.equals("") || parentName.equals("**")) {
+//			drawArchitecture(getCurrentDrawingDetail());
+//		} else {
+//			ModuleDTO[] children = defineService.getChildrenFromModule(parentName);
+//			if (children.length > 0) {
+//				setCurrentPaths(new String[] { parentName });
+//				//drawModulesAndLines(children);
+//			} else {
+//				logger.warn("Tried to draw modules for \"" + parentName + "\", but it has no children.");
+//			}
+//		}
 	}
 
 	private void getAndDrawModulesIn(String[] parentNames) {

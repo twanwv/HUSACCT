@@ -85,15 +85,17 @@ public class NewDrawingState {
 	public void addContextFigure(BaseFigure contextFigure) {
 		if (null != parentState) {
 			AbstractDTO contextDTO = parentState.getFigureDTO(contextFigure);
-			String path = null;
-			if (contextDTO instanceof ModuleDTO) {
-				path = ((ModuleDTO) contextDTO).logicalPath;
-			} else if (contextDTO instanceof AnalysedModuleDTO) {
-				path = ((AnalysedModuleDTO) contextDTO).uniqueName;
-			} else {
-				throw new RuntimeException("DTO type not supported");
+			if (null != contextDTO) {
+				String path = null;
+				if (contextDTO instanceof ModuleDTO) {
+					path = ((ModuleDTO) contextDTO).logicalPath;
+				} else if (contextDTO instanceof AnalysedModuleDTO) {
+					path = ((AnalysedModuleDTO) contextDTO).uniqueName;
+				} else {
+					throw new RuntimeException(String.format("DTO type not supported %s", contextDTO.getClass().getName()));
+				}
+				addFigure(path, contextFigure, contextDTO);
 			}
-			addFigure(path, contextFigure, contextDTO);
 		}
 	}
 
@@ -102,7 +104,7 @@ public class NewDrawingState {
 		if (null != pathMap) {
 			return pathMap.getFigures();
 		} else {
-			return new ArrayList<BaseFigure>(); 
+			return new ArrayList<BaseFigure>();
 		}
 	}
 
@@ -131,15 +133,15 @@ public class NewDrawingState {
 	public boolean isViolatedFigure(BaseFigure selectedFigure) {
 		return violatedFigureDTOMap.containsKey(selectedFigure);
 	}
-	
+
 	public void addViolatedFigure(BaseFigure figure, ViolationDTO[] dtos) {
 		violatedFigureDTOMap.put(figure, dtos);
 	}
-	
+
 	public ViolationDTO[] getViolatedDTOs(BaseFigure figure) {
 		return violatedFigureDTOMap.get(figure);
 	}
-	
+
 	public boolean isViolationLine(BaseFigure selectedFigure) {
 		return violationDTOMap.containsKey(selectedFigure);
 	}
