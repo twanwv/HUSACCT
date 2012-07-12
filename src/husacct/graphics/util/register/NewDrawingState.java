@@ -85,19 +85,23 @@ public class NewDrawingState {
 
 	public void addContextFigure(BaseFigure contextFigure) {
 		if (null != parentState) {
+			String path = parentState.getParentOfFigure(contextFigure);
 			AbstractDTO contextDTO = parentState.getFigureDTO(contextFigure);
-			if (null != contextDTO) {
-				String path = null;
-				if (contextDTO instanceof ModuleDTO) {
-					path = ((ModuleDTO) contextDTO).logicalPath;
-				} else if (contextDTO instanceof AnalysedModuleDTO) {
-					path = ((AnalysedModuleDTO) contextDTO).uniqueName;
-				} else {
-					throw new RuntimeException(String.format("DTO type not supported %s", contextDTO.getClass().getName()));
-				}
+			if (!path.isEmpty() && null != contextDTO) {
 				addFigure(path, contextFigure, contextDTO);
 			}
 		}
+	}
+	
+	public String getParentOfFigure(BaseFigure figure){
+		String parentPath = "";
+		for(String path : paths.keySet()){
+			if(paths.get(path).containsFigure(figure)){
+				parentPath = path;
+				continue;
+			}
+		}
+		return parentPath;
 	}
 	
 	public ArrayList<BaseFigure> getFigures() {
