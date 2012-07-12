@@ -9,6 +9,7 @@ import husacct.graphics.presentation.figures.BaseFigure;
 import husacct.graphics.presentation.figures.RelationFigure;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class NewDrawingState {
@@ -97,6 +98,15 @@ public class NewDrawingState {
 				addFigure(path, contextFigure, contextDTO);
 			}
 		}
+	}
+	
+	public ArrayList<BaseFigure> getFigures() {
+		ArrayList<BaseFigure> figures = new ArrayList<BaseFigure>();
+		Collection<NewFigureMap> figureMaps = paths.values();
+		for(NewFigureMap map : figureMaps){
+			figures.addAll(map.getFigures());
+		}
+		return figures;
 	}
 
 	public ArrayList<BaseFigure> getFiguresByPath(String path) {

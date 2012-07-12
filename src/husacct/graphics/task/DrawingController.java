@@ -85,7 +85,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 		threadMonitor = new ThreadMonitor(this);
 	}
-	
+
 	protected NewDrawingState getCurrentState() {
 		return register.getCurrentState();
 	}
@@ -207,13 +207,13 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 		drawing.updateLines();
 	}
-	
+
 	public void drawArchitecture(DrawingDetail detail) {
 		drawingView.cannotZoomOut();
 	}
-	
+
 	public abstract void refreshDrawing();
-	
+
 	protected void drawDrawing() {
 		runThread(new DrawingFiguresThread(this));
 	}
@@ -222,7 +222,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		drawFigures();
 		updateLayout();
 		drawLines();
-		//TODO: rewrite
+		// TODO: rewrite
 		// graphicsFrame.setCurrentPaths(getCurrentPaths());
 		graphicsFrame.updateGUI();
 	}
@@ -261,13 +261,10 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public void drawDependencies() {
 		NewDrawingState state = getCurrentState();
-		ArrayList<String> paths = state.getPaths();
-		for (String path : paths) {
-			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
-			for (BaseFigure figureFrom : figures) {
-				for (BaseFigure figureTo : figures) {
-					drawDependenciesBetween(figureFrom, figureTo);
-				}
+		ArrayList<BaseFigure> figures = state.getFigures();
+		for (BaseFigure figureFrom : figures) {
+			for (BaseFigure figureTo : figures) {
+				drawDependenciesBetween(figureFrom, figureTo);
 			}
 		}
 	}
@@ -288,13 +285,10 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public void drawViolations() {
 		NewDrawingState state = getCurrentState();
-		ArrayList<String> paths = state.getPaths();
-		for (String path : paths) {
-			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
-			for (BaseFigure figureFrom : figures) {
-				for (BaseFigure figureTo : figures) {
-					drawViolationsBetween(figureFrom, figureTo);
-				}
+		ArrayList<BaseFigure> figures = state.getFigures();
+		for (BaseFigure figureFrom : figures) {
+			for (BaseFigure figureTo : figures) {
+				drawViolationsBetween(figureFrom, figureTo);
 			}
 		}
 	}
@@ -332,7 +326,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		else
 			state = new DrawingState(drawing);
 
-		//state.save(figureMap);
+		// state.save(figureMap);
 		storedStates.put(paths, state);
 	}
 
@@ -345,7 +339,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected void restoreFigurePositions(String paths) {
 		if (storedStates.containsKey(paths)) {
 			DrawingState state = storedStates.get(paths);
-			//state.restore(figureMap);
+			// state.restore(figureMap);
 			drawingView.setHasHiddenFigures(state.hasHiddenFigures());
 		}
 	}
@@ -435,7 +429,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	protected ArrayList<String> getParentNamesHelper(ArrayList<BaseFigure> figures) {
 		ArrayList<String> names = new ArrayList<String>();
 		for (BaseFigure figure : figures) {
