@@ -112,6 +112,10 @@ public class AnalysedController extends DrawingController {
 		ArrayList<String> currentPaths = getCurrentState().getPaths();
 		if (currentPaths.size() > 0) {
 			ArrayList<String> parentNames = new ArrayList<String>();
+			
+			//TODO context figures are also fetched as path.
+			//This way you don't get the same view when you zoom out as from where you zoomed in.
+			//Filter them in the NewDrawingState class, so their paths don't get added.
 			for (String path : currentPaths) {
 				AnalysedModuleDTO parentDTO = analyseService.getParentModuleForModule(path);
 				if (!parentNames.contains(parentDTO.uniqueName)) {

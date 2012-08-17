@@ -1,9 +1,7 @@
 package husacct.graphics.util.register;
 
 import husacct.common.dto.AbstractDTO;
-import husacct.common.dto.AnalysedModuleDTO;
 import husacct.common.dto.DependencyDTO;
-import husacct.common.dto.ModuleDTO;
 import husacct.common.dto.ViolationDTO;
 import husacct.graphics.presentation.figures.BaseFigure;
 import husacct.graphics.presentation.figures.RelationFigure;
@@ -85,7 +83,7 @@ public class NewDrawingState {
 
 	public void addContextFigure(BaseFigure contextFigure) {
 		if (null != parentState) {
-			String path = parentState.getParentOfFigure(contextFigure);
+			String path = parentState.getParentPathOfFigure(contextFigure);
 			AbstractDTO contextDTO = parentState.getFigureDTO(contextFigure);
 			if (!path.isEmpty() && null != contextDTO) {
 				addFigure(path, contextFigure, contextDTO);
@@ -93,7 +91,7 @@ public class NewDrawingState {
 		}
 	}
 	
-	public String getParentOfFigure(BaseFigure figure){
+	public String getParentPathOfFigure(BaseFigure figure){
 		String parentPath = "";
 		for(String path : paths.keySet()){
 			if(paths.get(path).containsFigure(figure)){

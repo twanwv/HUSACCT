@@ -373,17 +373,17 @@ public abstract class DrawingController extends DrawingSettingsController {
 		}
 	}
 
-	public void setDrawingViewVisible() {
+	public synchronized void setDrawingViewVisible() {
 		graphicsFrame.hideLoadingScreen();
 		drawingView.setVisible(true);
 	}
 
-	public void setDrawingViewNonVisible() {
+	public synchronized void setDrawingViewNonVisible() {
 		drawingView.setVisible(false);
 		graphicsFrame.showLoadingScreen();
 	}
 
-	public boolean isDrawingVisible() {
+	public synchronized boolean isDrawingVisible() {
 		return drawingView.isVisible();
 	}
 
