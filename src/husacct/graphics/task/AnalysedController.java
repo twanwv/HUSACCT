@@ -110,31 +110,7 @@ public class AnalysedController extends DrawingController {
 	@Override
 	public void moduleZoomOut() {
 		super.notifyServiceListeners();
-		setPreviousAsCurrentState();
-//		ArrayList<String> currentPaths = getCurrentState().getPaths();
-//		if (currentPaths.size() > 0) {
-//			ArrayList<String> parentNames = new ArrayList<String>();
-//			
-//			//TODO context figures are also fetched as path.
-//			//This way you don't get the same view when you zoom out as from where you zoomed in.
-//			//Filter them in the NewDrawingState class, so their paths don't get added.
-//			for (String path : currentPaths) {
-//				AnalysedModuleDTO parentDTO = analyseService.getParentModuleForModule(path);
-//				if (!parentNames.contains(parentDTO.uniqueName)) {
-//					parentNames.add(parentDTO.uniqueName);
-//				}
-//			}
-//			createState(parentNames);
-//
-//			if (parentNames.size() > 0) {
-//				getModulesIn(parentNames);
-//			}
-//			drawDrawing();
-//		} else {
-//			logger.warn("Tried to zoom out from \"" + getCurrentState().getFullPath() + "\", but it has no parent (could be root if it's an empty string).");
-//			logger.debug("Reverting to the root of the application.");
-//			drawArchitecture(getCurrentDrawingDetail());
-//		}
+		openPreviousAsCurrentState();
 	}
 
 	private void getModulesIn(ArrayList<String> parentNames) {

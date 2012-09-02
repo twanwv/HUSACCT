@@ -90,7 +90,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		return register.getCurrentState();
 	}
 	
-	protected void setPreviousAsCurrentState(){
+	protected void openPreviousAsCurrentState(){
 		if(register.hasPreviousAsCurrentState()){
 			register.setPreviousAsCurrentState();
 			clearDrawing();

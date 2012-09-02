@@ -1,7 +1,5 @@
 package husacct.graphics.util.register;
 
-import husacct.graphics.task.AnalysedController;
-
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;

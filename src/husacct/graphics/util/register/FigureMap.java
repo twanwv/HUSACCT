@@ -2,7 +2,6 @@ package husacct.graphics.util.register;
 
 import husacct.common.dto.AbstractDTO;
 import husacct.graphics.presentation.figures.BaseFigure;
-import husacct.graphics.presentation.figures.FigureFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;

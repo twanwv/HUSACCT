@@ -4,7 +4,6 @@ import husacct.ServiceProvider;
 import husacct.analyse.IAnalyseService;
 import husacct.common.dto.AbstractDTO;
 import husacct.common.dto.DependencyDTO;
-import husacct.common.dto.ModuleDTO;
 import husacct.common.dto.ViolationDTO;
 import husacct.common.services.IServiceListener;
 import husacct.define.IDefineService;
@@ -12,9 +11,7 @@ import husacct.graphics.presentation.figures.BaseFigure;
 import husacct.graphics.util.DrawingDetail;
 import husacct.validate.IValidateService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 public class DefinedController extends DrawingController {
 	protected IAnalyseService analyseService;
