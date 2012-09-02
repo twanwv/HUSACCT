@@ -235,30 +235,27 @@ public class NewDrawingState {
 	}
 
 	public NewDrawingState recreateState() {
+		FigureFactory figureFactory = new FigureFactory();
 		NewDrawingState copy = new NewDrawingState(fullPath);
 		copy.setParentState(getParentState());
-		for(String key : paths.keySet()){
-			NewFigureMap oldMap = paths.get(key);
-			copy.addPath(key);
-			copy.recreateMap(key, oldMap);
+		for(String path : paths.keySet()){
+			NewFigureMap oldMap = paths.get(path);
+			copy.addPath(path);
+			for(AbstractDTO dto : oldMap.figureDTOMap.values()){
+				// New figures are created, because you can't reuse JHotDraw figures.
+				BaseFigure newFigure = figureFactory.createFigure(dto);
+				copy.addFigure(path, newFigure, dto);
+			}
 		}
-		for(String key : contextPaths.keySet()){
-			NewFigureMap oldMap = contextPaths.get(key);
-			copy.addPath(key);
-			copy.recreateMap(key, oldMap);
+		for(String contextPath : contextPaths.keySet()){
+			NewFigureMap oldMap = contextPaths.get(contextPath);
+			copy.addContextPath(contextPath);
+			for(BaseFigure contextFigure : oldMap.figureDTOMap.keySet()){
+				copy.addContextFigure(contextFigure);
+			}
 		}
 		// No need to copy over the dependency and violation entities
 		// These are fetched from the service on drawing 
 		return copy;
-	}
-	
-	
-	private void recreateMap(String path, NewFigureMap oldMap){
-		FigureFactory factory = new FigureFactory();
-		for(AbstractDTO dto : oldMap.figureDTOMap.values()){
-			// New figures are created, because you can't reuse JHotDraw figures.
-			BaseFigure newFigure = factory.createFigure(dto);
-			addFigure(path, newFigure, dto);
-		}
 	}
 }

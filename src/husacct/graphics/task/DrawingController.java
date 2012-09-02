@@ -93,6 +93,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected void setPreviousAsCurrentState(){
 		if(register.hasPreviousAsCurrentState()){
 			register.setPreviousAsCurrentState();
+			clearDrawing();
 			drawDrawing();
 		}
 	}
@@ -240,6 +241,8 @@ public abstract class DrawingController extends DrawingSettingsController {
 		ArrayList<String> contextPaths = state.getContextPaths();
 		boolean mulipleParents = contextPaths.size() > 1 || paths.size() > 1 || (contextPaths.size() == 1 && paths.size() == 1);
 		System.err.println("Multiple parents: "+mulipleParents);
+		System.out.println("Paths = " + paths.size());
+		System.out.println("Context paths = " + contextPaths.size());
 		for (String path : paths) {
 			BaseFigure parentFigure = null;
 			if (mulipleParents) {
