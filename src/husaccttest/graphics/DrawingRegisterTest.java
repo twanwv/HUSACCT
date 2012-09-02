@@ -14,7 +14,7 @@ import husacct.graphics.presentation.figures.FigureFactory;
 import husacct.graphics.presentation.figures.ModuleFigure;
 import husacct.graphics.presentation.figures.RelationFigure;
 import husacct.graphics.util.register.DrawingRegister;
-import husacct.graphics.util.register.NewDrawingState;
+import husacct.graphics.util.register.DrawingState;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class DrawingRegisterTest {
 	private DrawingRegister register;
-	private NewDrawingState rootState, domainState, domainBlogState;
+	private DrawingState rootState, domainState, domainBlogState;
 	private String rootPath, domainPath, domainBlogPath;
 	private FigureFactory factory;
 
@@ -39,19 +39,19 @@ public class DrawingRegisterTest {
 
 	private void createRootState() {
 		rootPath = "";
-		rootState = new NewDrawingState(rootPath);
+		rootState = new DrawingState(rootPath);
 		register.addState(rootState);
 	}
 
 	private void createDomainState() {
 		domainPath = "domain";
-		domainState = new NewDrawingState(domainPath);
+		domainState = new DrawingState(domainPath);
 		register.addState(domainState);
 	}
 
 	private void createDomainBlogState() {
 		domainBlogPath = "domain.blog";
-		domainBlogState = new NewDrawingState(domainBlogPath);
+		domainBlogState = new DrawingState(domainBlogPath);
 		register.addState(domainBlogState);
 	}
 
@@ -75,7 +75,7 @@ public class DrawingRegisterTest {
 		createRootState();
 		createDomainState();
 		
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		BaseFigure figure = new ModuleFigure("name", "type");
 		AbstractDTO dto = new AbstractDTO();
 		state.addFigure("domain", figure, dto);
@@ -94,7 +94,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void getState() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		assertNotNull(state);
 		assertEquals(state, rootState);
 	}
@@ -102,7 +102,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void addFigure() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		BaseFigure figure = new ModuleFigure("name", "type");
 		AbstractDTO dto = new AbstractDTO();
 		state.addFigure("domain", figure, dto);
@@ -116,10 +116,10 @@ public class DrawingRegisterTest {
 		createDomainState();
 		BaseFigure contextFigure = new ModuleFigure("name", "type");
 		AbstractDTO contextDTO = new AnalysedModuleDTO("domain", "domain", "package", "direct");
-		NewDrawingState rootState = register.getState(rootPath);
+		DrawingState rootState = register.getState(rootPath);
 		rootState.addFigure("domain", contextFigure, contextDTO);
 
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		state.addContextFigure(contextFigure);
 
 		assertNotNull(domainState.getFigureDTO(contextFigure));
@@ -129,7 +129,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void addDependency() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		DependencyDTO[] dtos = new DependencyDTO[]{ new DependencyDTO("domain", "presentation", "import", false, 1)};
 		RelationFigure dependencyFigure = factory.createFigure(dtos);
 		state.addDependency(dependencyFigure, dtos);
@@ -140,7 +140,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void maxDependenciesCountUpdated() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		
 		DependencyDTO[] dtosCollectionOne = new DependencyDTO[]{ new DependencyDTO("domain", "presentation", "import", false, 1)};
 		RelationFigure dependencyFigureOne = factory.createFigure(dtosCollectionOne);
@@ -156,7 +156,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void addViolation() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		ViolationDTO[] dtos = new ViolationDTO[]{ new ViolationDTO("domain", "presentation", "domain", "presentation", new ViolationTypeDTO("import", "importDescription", true), null, "Violation between domain and presentation", 1, Color.red, "High", 3, false)};
 		RelationFigure violationFigure = factory.createFigure(dtos);
 		state.addViolation(violationFigure, dtos);
@@ -167,7 +167,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void maxViolationsCountUpdated() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		
 		ViolationDTO[] dtosCollectionOne = new ViolationDTO[]{ new ViolationDTO("domain", "presentation", "domain", "presentation", new ViolationTypeDTO("import", "importDescription", true), null, "Violation between domain and presentation", 1, Color.red, "High", 3, false) };
 		RelationFigure violationFigureOne = factory.createFigure(dtosCollectionOne);
@@ -184,7 +184,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void maxAllCountUpdated() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		
 		DependencyDTO[] dtosCollectionOne = new DependencyDTO[]{ new DependencyDTO("domain", "presentation", "import", false, 1)};
 		RelationFigure dependencyFigureOne = factory.createFigure(dtosCollectionOne);
@@ -205,7 +205,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void returnPaths() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		BaseFigure figureOne = new ModuleFigure("name", "type");
 		AbstractDTO dtoOne = new AbstractDTO();
 		state.addFigure("domain", figureOne, dtoOne);
@@ -220,7 +220,7 @@ public class DrawingRegisterTest {
 	@Test
 	public void returnFigures() {
 		createRootState();
-		NewDrawingState state = register.getCurrentState();
+		DrawingState state = register.getCurrentState();
 		BaseFigure figureOne = new ModuleFigure("name", "type");
 		AbstractDTO dtoOne = new AbstractDTO();
 		state.addFigure("domain", figureOne, dtoOne);

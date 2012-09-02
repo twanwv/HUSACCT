@@ -5,7 +5,7 @@ import husacct.common.dto.AnalysedModuleDTO;
 import husacct.common.dto.ModuleDTO;
 import husacct.graphics.presentation.Drawing;
 import husacct.graphics.presentation.figures.BaseFigure;
-import husacct.graphics.util.FigureMap;
+import husacct.graphics.util.OldFigureMap;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -17,13 +17,13 @@ import java.util.Set;
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.Figure;
 
-public class DrawingState {
+public class OldDrawingState {
 	private Drawing drawing;
 	private HashMap<String, FigureState> savedPositions;
-	private FigureMap figureMap = null;
+	private OldFigureMap figureMap = null;
 	private boolean hasHiddenFigures = false;
 
-	public DrawingState(Drawing theDrawing) {
+	public OldDrawingState(Drawing theDrawing) {
 		drawing = theDrawing;
 		savedPositions = new HashMap<String, FigureState>();
 	}
@@ -33,7 +33,7 @@ public class DrawingState {
 		hasHiddenFigures = false;
 	}
 
-	public void save(FigureMap figureMap) {
+	public void save(OldFigureMap figureMap) {
 		this.figureMap = figureMap;
 		clear();
 
@@ -76,7 +76,7 @@ public class DrawingState {
 		return figureMap.getModuleDTO(bf) != null;
 	}	
 
-	public void restore(FigureMap figureMap) {
+	public void restore(OldFigureMap figureMap) {
 		this.figureMap = figureMap;
 
 		restoreFigures();

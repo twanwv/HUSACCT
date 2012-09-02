@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class NewFigureMap {
+public class FigureMap {
 	protected HashMap<BaseFigure, AbstractDTO> figureDTOMap;
 
-	public NewFigureMap() {
+	public FigureMap() {
 		figureDTOMap = new HashMap<BaseFigure, AbstractDTO>();
 	}
 

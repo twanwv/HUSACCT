@@ -6,7 +6,7 @@ import husacct.graphics.presentation.figures.RelationFigure;
 import husacct.graphics.presentation.linelayoutstrategies.ConnectorLineSeparationStrategy;
 import husacct.graphics.presentation.linelayoutstrategies.ILineSeparationStrategy;
 import husacct.graphics.task.layout.FigureConnectorStrategy;
-import husacct.graphics.util.register.NewDrawingState;
+import husacct.graphics.util.register.DrawingState;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -32,7 +32,7 @@ public class Drawing extends QuadTreeDrawing {
 	private Logger logger = Logger.getLogger(Drawing.class);
 	private FileManager filemanager = new FileManager();
 	private File selectedFile = filemanager.getFile();
-	private NewDrawingState drawingState;
+	private DrawingState drawingState;
 	private FigureConnectorStrategy connectionStrategy;
 
 	public Drawing() {
@@ -41,7 +41,7 @@ public class Drawing extends QuadTreeDrawing {
 		hiddenFigures = new ArrayList<BaseFigure>();
 	}
 	
-	public void setState(NewDrawingState state) {
+	public void setState(DrawingState state) {
 		drawingState = state;
 	}
 	

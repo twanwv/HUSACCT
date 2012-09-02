@@ -15,7 +15,7 @@ import husacct.graphics.presentation.figures.BaseFigure;
 import husacct.graphics.presentation.figures.FigureFactory;
 import husacct.graphics.presentation.figures.RelationFigure;
 import husacct.graphics.task.layout.BasicLayoutStrategy;
-import husacct.graphics.task.layout.DrawingState;
+import husacct.graphics.task.layout.OldDrawingState;
 import husacct.graphics.task.layout.LayeredLayoutStrategy;
 import husacct.graphics.task.layout.LayoutStrategy;
 import husacct.graphics.task.layout.NoLayoutStrategy;
@@ -23,7 +23,7 @@ import husacct.graphics.util.DrawingDetail;
 import husacct.graphics.util.DrawingLayoutStrategy;
 import husacct.graphics.util.helpers.PathHelper;
 import husacct.graphics.util.register.DrawingRegister;
-import husacct.graphics.util.register.NewDrawingState;
+import husacct.graphics.util.register.DrawingState;
 import husacct.graphics.util.threads.DrawingFiguresThread;
 import husacct.graphics.util.threads.ThreadMonitor;
 
@@ -40,7 +40,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected static final boolean debugPrint = true;
 	protected DrawingLayoutStrategy layoutStrategyOption;
 
-	private HashMap<String, DrawingState> storedStates = new HashMap<String, DrawingState>();
+	private HashMap<String, OldDrawingState> storedStates = new HashMap<String, OldDrawingState>();
 
 	private Drawing drawing;
 	private DrawingView drawingView;
@@ -86,7 +86,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 		threadMonitor = new ThreadMonitor(this);
 	}
 
-	protected NewDrawingState getCurrentState() {
+	protected DrawingState getCurrentState() {
 		return register.getCurrentState();
 	}
 	
@@ -99,7 +99,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	protected void createState(ArrayList<String> paths) {
-		register.addState(new NewDrawingState(PathHelper.createCombinedPathHelper(paths)));
+		register.addState(new DrawingState(PathHelper.createCombinedPathHelper(paths)));
 	}
 
 	private void runThread(Runnable runnable) {
@@ -183,7 +183,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	public void figureSelected(BaseFigure[] selectedFigures) {
 		if (selectedFigures.length == 1) {
 			BaseFigure selectedFigure = selectedFigures[0];
-			NewDrawingState state = getCurrentState();
+			DrawingState state = getCurrentState();
 			if (state.isViolatedFigure(selectedFigure)) {
 				graphicsFrame.showViolationsProperties(state.getViolatedDTOs(selectedFigure));
 			} else if (state.isViolationLine(selectedFigure)) {
@@ -236,7 +236,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	public void drawFigures() {
-		NewDrawingState state = getCurrentState();
+		DrawingState state = getCurrentState();
 		ArrayList<String> paths = state.getPaths();
 		ArrayList<String> contextPaths = state.getContextPaths();
 		boolean mulipleParents = contextPaths.size() > 1 || paths.size() > 1 || (contextPaths.size() == 1 && paths.size() == 1);
@@ -287,7 +287,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	public void drawDependencies() {
-		NewDrawingState state = getCurrentState();
+		DrawingState state = getCurrentState();
 		ArrayList<BaseFigure> figures = state.getAllFigures();
 		for (BaseFigure figureFrom : figures) {
 			for (BaseFigure figureTo : figures) {
@@ -298,7 +298,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	private void drawDependenciesBetween(BaseFigure figureFrom, BaseFigure figureTo) {
 		if (!figureFrom.equals(figureTo)) {
-			NewDrawingState state = getCurrentState();
+			DrawingState state = getCurrentState();
 			AbstractDTO dtoFrom = state.getFigureDTO(figureFrom);
 			AbstractDTO dtoTo = state.getFigureDTO(figureTo);
 			DependencyDTO[] dependencies = getDependenciesBetween(dtoFrom, dtoTo);
@@ -311,7 +311,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected abstract DependencyDTO[] getDependenciesBetween(AbstractDTO dtoFrom, AbstractDTO dtoTo);
 
 	public void drawViolations() {
-		NewDrawingState state = getCurrentState();
+		DrawingState state = getCurrentState();
 		ArrayList<BaseFigure> figures = state.getAllFigures();
 		for (BaseFigure figureFrom : figures) {
 			for (BaseFigure figureTo : figures) {
@@ -321,7 +321,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	private void drawViolationsBetween(BaseFigure figureFrom, BaseFigure figureTo) {
-		NewDrawingState state = getCurrentState();
+		DrawingState state = getCurrentState();
 		AbstractDTO dtoFrom = state.getFigureDTO(figureFrom);
 		AbstractDTO dtoTo = state.getFigureDTO(figureTo);
 		ViolationDTO[] violations = getViolationsBetween(dtoFrom, dtoTo);
@@ -347,11 +347,11 @@ public abstract class DrawingController extends DrawingSettingsController {
 	@Deprecated
 	protected void saveFigurePositions() {
 		String paths = getCurrentPathsToString();
-		DrawingState state;
+		OldDrawingState state;
 		if (storedStates.containsKey(paths))
 			state = storedStates.get(paths);
 		else
-			state = new DrawingState(drawing);
+			state = new OldDrawingState(drawing);
 
 		// state.save(figureMap);
 		storedStates.put(paths, state);
@@ -365,7 +365,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	@Deprecated
 	protected void restoreFigurePositions(String paths) {
 		if (storedStates.containsKey(paths)) {
-			DrawingState state = storedStates.get(paths);
+			OldDrawingState state = storedStates.get(paths);
 			// state.restore(figureMap);
 			drawingView.setHasHiddenFigures(state.hasHiddenFigures());
 		}
@@ -438,7 +438,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 	}
 
 	protected void addViolation(ViolationDTO[] violationDTOs, BaseFigure figureFrom, BaseFigure figureTo) {
-		NewDrawingState state = getCurrentState();
+		DrawingState state = getCurrentState();
 		try {
 			if (figureFrom.equals(figureTo)) {
 				try {

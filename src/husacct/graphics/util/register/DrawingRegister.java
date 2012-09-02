@@ -8,11 +8,11 @@ import org.apache.log4j.Logger;
 
 public class DrawingRegister {
 	private Logger logger = Logger.getLogger(DrawingRegister.class);
-	private NewDrawingState currentState, previousState;
-	private HashMap<String, NewDrawingState> states;
+	private DrawingState currentState, previousState;
+	private HashMap<String, DrawingState> states;
 
 	public DrawingRegister() {
-		states = new HashMap<String, NewDrawingState>();
+		states = new HashMap<String, DrawingState>();
 	}
 
 	public void clear() {
@@ -21,7 +21,7 @@ public class DrawingRegister {
 		previousState = null;
 	}
 
-	public NewDrawingState getCurrentState() {
+	public DrawingState getCurrentState() {
 		return currentState;
 	}
 	
@@ -38,12 +38,12 @@ public class DrawingRegister {
 		}
 	}
 
-	public void addState(NewDrawingState state) {
+	public void addState(DrawingState state) {
 		System.err.println(states.keySet().toString());
 		System.err.println("key = " + state.getFullPath());
 		if (contains(state)) {
 			logger.warn("State is known, get old parent");
-			NewDrawingState parentState = getState(state.getFullPath()).getParentState();
+			DrawingState parentState = getState(state.getFullPath()).getParentState();
 			previousState = parentState;
 		} else {
 			logger.warn("State is not known, current state is parent");
@@ -57,11 +57,11 @@ public class DrawingRegister {
 		previousState = null;
 	}
 
-	public NewDrawingState getState(String path) {
+	public DrawingState getState(String path) {
 		return states.get(path);
 	}
 
-	public boolean contains(NewDrawingState state) {
+	public boolean contains(DrawingState state) {
 		return states.containsKey(state.getFullPath());
 	}
 }

@@ -8,7 +8,7 @@ import husacct.common.dto.ViolationDTO;
 import husacct.common.dto.ViolationTypeDTO;
 import husacct.graphics.presentation.figures.ModuleFigure;
 import husacct.graphics.presentation.figures.RelationFigure;
-import husacct.graphics.util.FigureMap;
+import husacct.graphics.util.OldFigureMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class FigureMapTest {
-	private FigureMap figureMap;
+	private OldFigureMap figureMap;
 	private DependencyDTO[] dependenciesCollection1, dependenciesCollection2;
 	private ViolationDTO[] violationsCollection1, violationsCollection2;
 	private ModuleFigure normalFigure;
@@ -29,7 +29,7 @@ public class FigureMapTest {
 
 	@Before
 	public void setup() {
-		figureMap = new FigureMap();
+		figureMap = new OldFigureMap();
 		dependenciesCollection1 = new DependencyDTO[1];
 		dependenciesCollection1[0] = new DependencyDTO("from", "to", "type", 1);
 		dependenciesCollection2 = new DependencyDTO[4];

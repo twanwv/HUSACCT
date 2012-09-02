@@ -11,7 +11,7 @@ import husacct.graphics.presentation.figures.RelationFigure;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class FigureMap {
+public class OldFigureMap {
 	private HashMap<String, BaseFigure> moduleFiguresByName = new HashMap<String, BaseFigure>();
 	private HashMap<BaseFigure, AbstractDTO> moduleFigureDTOMap = new HashMap<BaseFigure, AbstractDTO>();
 	private HashMap<RelationFigure, DependencyDTO[]> dependencyLineDTOMap = new HashMap<RelationFigure, DependencyDTO[]>();
@@ -20,7 +20,7 @@ public class FigureMap {
 	
 	private int maxDependencies, maxViolations, maxAll;
 
-	public FigureMap() {
+	public OldFigureMap() {
 		clearAll();
 	}
 
