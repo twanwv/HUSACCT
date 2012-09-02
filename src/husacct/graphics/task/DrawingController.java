@@ -89,6 +89,13 @@ public abstract class DrawingController extends DrawingSettingsController {
 	protected NewDrawingState getCurrentState() {
 		return register.getCurrentState();
 	}
+	
+	protected void setPreviousAsCurrentState(){
+		if(register.hasPreviousAsCurrentState()){
+			register.setPreviousAsCurrentState();
+			drawDrawing();
+		}
+	}
 
 	protected void createState(ArrayList<String> paths) {
 		register.addState(new NewDrawingState(PathHelper.createCombinedPathHelper(paths)));
@@ -230,7 +237,9 @@ public abstract class DrawingController extends DrawingSettingsController {
 	public void drawFigures() {
 		NewDrawingState state = getCurrentState();
 		ArrayList<String> paths = state.getPaths();
-		boolean mulipleParents = paths.size() > 1;
+		ArrayList<String> contextPaths = state.getContextPaths();
+		boolean mulipleParents = contextPaths.size() > 1 || paths.size() > 1 || (contextPaths.size() == 1 && paths.size() == 1);
+		System.err.println("Multiple parents: "+mulipleParents);
 		for (String path : paths) {
 			BaseFigure parentFigure = null;
 			if (mulipleParents) {
@@ -238,6 +247,21 @@ public abstract class DrawingController extends DrawingSettingsController {
 				drawing.add(parentFigure);
 			}
 			ArrayList<BaseFigure> figures = state.getFiguresByPath(path);
+			for (BaseFigure figure : figures) {
+				drawing.add(figure);
+				if (mulipleParents) {
+					parentFigure.add(figure);
+				}
+			}
+		}
+		
+		for (String path : contextPaths) {
+			BaseFigure parentFigure = null;
+			if (mulipleParents) {
+				parentFigure = figureFactory.createParentFigure(path);
+				drawing.add(parentFigure);
+			}
+			ArrayList<BaseFigure> figures = state.getContextFiguresByPath(path);
 			for (BaseFigure figure : figures) {
 				drawing.add(figure);
 				if (mulipleParents) {
@@ -261,7 +285,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public void drawDependencies() {
 		NewDrawingState state = getCurrentState();
-		ArrayList<BaseFigure> figures = state.getFigures();
+		ArrayList<BaseFigure> figures = state.getAllFigures();
 		for (BaseFigure figureFrom : figures) {
 			for (BaseFigure figureTo : figures) {
 				drawDependenciesBetween(figureFrom, figureTo);
@@ -285,7 +309,7 @@ public abstract class DrawingController extends DrawingSettingsController {
 
 	public void drawViolations() {
 		NewDrawingState state = getCurrentState();
-		ArrayList<BaseFigure> figures = state.getFigures();
+		ArrayList<BaseFigure> figures = state.getAllFigures();
 		for (BaseFigure figureFrom : figures) {
 			for (BaseFigure figureTo : figures) {
 				drawViolationsBetween(figureFrom, figureTo);

@@ -1,8 +1,13 @@
 package husacct.graphics.util.register;
 
+import husacct.graphics.task.AnalysedController;
+
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 public class DrawingRegister {
+	private Logger logger = Logger.getLogger(DrawingRegister.class);
 	private NewDrawingState currentState, previousState;
 	private HashMap<String, NewDrawingState> states;
 
@@ -19,12 +24,28 @@ public class DrawingRegister {
 	public NewDrawingState getCurrentState() {
 		return currentState;
 	}
+	
+	public boolean hasPreviousAsCurrentState() {
+		return currentState.hasParentState();
+	}
+
+	public void setPreviousAsCurrentState() {
+		if (hasPreviousAsCurrentState()) {
+			currentState = currentState.getParentState();
+		} else {
+			System.out.print(false);
+		}
+	}
 
 	public void addState(NewDrawingState state) {
+		System.err.println(states.keySet().toString());
+		System.err.println("key = " + state.getFullPath());
 		if (contains(state)) {
+			logger.warn("State is known, get old parent");
 			NewDrawingState parentState = getState(state.getFullPath()).getParentState();
 			previousState = parentState;
 		} else {
+			logger.warn("State is not known, current state is parent");
 			previousState = currentState;
 		}
 		currentState = state;
@@ -32,6 +53,7 @@ public class DrawingRegister {
 			state.setParentState(previousState);
 		}
 		states.put(state.getFullPath(), state);
+		previousState = null;
 	}
 
 	public NewDrawingState getState(String path) {

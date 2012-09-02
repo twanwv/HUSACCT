@@ -4,6 +4,7 @@ import husacct.common.dto.AbstractDTO;
 import husacct.common.dto.DependencyDTO;
 import husacct.common.dto.ViolationDTO;
 import husacct.graphics.presentation.figures.BaseFigure;
+import husacct.graphics.presentation.figures.FigureFactory;
 import husacct.graphics.presentation.figures.RelationFigure;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 public class NewDrawingState {
 	private NewDrawingState parentState;
 	private String fullPath;
-	private HashMap<String, NewFigureMap> paths;
+	private HashMap<String, NewFigureMap> paths, contextPaths;
 	private HashMap<RelationFigure, DependencyDTO[]> dependencyDTOMap;
 	private HashMap<RelationFigure, ViolationDTO[]> violationDTOMap;
 	private HashMap<BaseFigure, ViolationDTO[]> violatedFigureDTOMap;
@@ -24,6 +25,7 @@ public class NewDrawingState {
 	public NewDrawingState(String path) {
 		fullPath = path;
 		paths = new HashMap<String, NewFigureMap>();
+		contextPaths = new HashMap<String, NewFigureMap>();
 		dependencyDTOMap = new HashMap<RelationFigure, DependencyDTO[]>();
 		violationDTOMap = new HashMap<RelationFigure, ViolationDTO[]>();
 		violatedFigureDTOMap = new HashMap<BaseFigure, ViolationDTO[]>();
@@ -31,6 +33,10 @@ public class NewDrawingState {
 
 	public void setParentState(NewDrawingState state) {
 		parentState = state;
+	}
+
+	public boolean hasParentState() {
+		return parentState != null;
 	}
 
 	public NewDrawingState getParentState() {
@@ -54,6 +60,24 @@ public class NewDrawingState {
 	private NewFigureMap getPath(String path) {
 		return paths.get(path);
 	}
+	
+	public boolean hasContext() {
+		return !contextPaths.isEmpty();
+	}
+	
+	private void addContextPath(String path) {
+		if (!contextPaths.containsKey(path)) {
+			contextPaths.put(path, new NewFigureMap());
+		}
+	}
+	
+	private NewFigureMap getContextPath(String path) {
+		return contextPaths.get(path);
+	}
+	
+	public ArrayList<String> getContextPaths() {
+		return new ArrayList<String>(contextPaths.keySet());
+	}
 
 	public void addFigure(String subPath, BaseFigure figure, AbstractDTO dto) {
 		addPath(subPath);
@@ -61,9 +85,28 @@ public class NewDrawingState {
 		map.addFigure(figure, dto);
 	}
 
+	public void addContextFigure(BaseFigure contextFigure) {
+		if (null != parentState) {
+			String path = parentState.getParentPathOfFigure(contextFigure);
+			AbstractDTO contextDTO = parentState.getFigureDTO(contextFigure);
+			if (!path.isEmpty() && null != contextDTO) {
+				addContextPath(path);
+				NewFigureMap map = getContextPath(path);
+				FigureFactory figureFactory = new FigureFactory();
+				BaseFigure newContextFigure = figureFactory.createFigure(contextDTO);
+				map.addFigure(newContextFigure, contextDTO);
+			}
+		}
+	}
+
 	public AbstractDTO getFigureDTO(BaseFigure figure) {
 		AbstractDTO dto = null;
 		for (NewFigureMap map : paths.values()) {
+			if (map.containsFigure(figure)) {
+				dto = map.getFigureDTO(figure);
+			}
+		}
+		for (NewFigureMap map : contextPaths.values()) {
 			if (map.containsFigure(figure)) {
 				dto = map.getFigureDTO(figure);
 			}
@@ -80,16 +123,6 @@ public class NewDrawingState {
 		}
 		return path;
 	}
-
-	public void addContextFigure(BaseFigure contextFigure) {
-		if (null != parentState) {
-			String path = parentState.getParentPathOfFigure(contextFigure);
-			AbstractDTO contextDTO = parentState.getFigureDTO(contextFigure);
-			if (!path.isEmpty() && null != contextDTO) {
-				addFigure(path, contextFigure, contextDTO);
-			}
-		}
-	}
 	
 	public String getParentPathOfFigure(BaseFigure figure){
 		String parentPath = "";
@@ -102,10 +135,14 @@ public class NewDrawingState {
 		return parentPath;
 	}
 	
-	public ArrayList<BaseFigure> getFigures() {
+	public ArrayList<BaseFigure> getAllFigures() {
 		ArrayList<BaseFigure> figures = new ArrayList<BaseFigure>();
 		Collection<NewFigureMap> figureMaps = paths.values();
 		for(NewFigureMap map : figureMaps){
+			figures.addAll(map.getFigures());
+		}
+		Collection<NewFigureMap> contextFigureMaps = contextPaths.values();
+		for(NewFigureMap map : contextFigureMaps){
 			figures.addAll(map.getFigures());
 		}
 		return figures;
@@ -113,6 +150,15 @@ public class NewDrawingState {
 
 	public ArrayList<BaseFigure> getFiguresByPath(String path) {
 		NewFigureMap pathMap = paths.get(path);
+		if (null != pathMap) {
+			return pathMap.getFigures();
+		} else {
+			return new ArrayList<BaseFigure>();
+		}
+	}
+	
+	public ArrayList<BaseFigure> getContextFiguresByPath(String path) {
+		NewFigureMap pathMap = contextPaths.get(path);
 		if (null != pathMap) {
 			return pathMap.getFigures();
 		} else {
