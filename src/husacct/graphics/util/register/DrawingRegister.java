@@ -34,7 +34,7 @@ public class DrawingRegister {
 			currentState = currentState.getParentState();
 			currentState = currentState.recreateState();
 		} else {
-			System.out.print(false);
+			logger.warn("Can't reopen a previous state if there is non. This is probably the root of the application.");
 		}
 	}
 

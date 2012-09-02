@@ -254,6 +254,9 @@ public class NewDrawingState {
 				copy.addContextFigure(contextFigure);
 			}
 		}
+		// We need to copy back over the newly created figures so the context figures work
+		paths = copy.paths;
+		contextPaths = copy.contextPaths;
 		// No need to copy over the dependency and violation entities
 		// These are fetched from the service on drawing 
 		return copy;
