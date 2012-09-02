@@ -12,15 +12,15 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public class NewDrawingState {
-	private NewDrawingState parentState;
-	private String fullPath;
-	private HashMap<String, NewFigureMap> paths, contextPaths;
-	private HashMap<RelationFigure, DependencyDTO[]> dependencyDTOMap;
-	private HashMap<RelationFigure, ViolationDTO[]> violationDTOMap;
-	private HashMap<BaseFigure, ViolationDTO[]> violatedFigureDTOMap;
-	private HashMap<BaseFigure, Double> figurePositions;
+	protected NewDrawingState parentState;
+	protected String fullPath;
+	protected HashMap<String, NewFigureMap> paths, contextPaths;
+	protected HashMap<RelationFigure, DependencyDTO[]> dependencyDTOMap;
+	protected HashMap<RelationFigure, ViolationDTO[]> violationDTOMap;
+	protected HashMap<BaseFigure, ViolationDTO[]> violatedFigureDTOMap;
+	protected HashMap<BaseFigure, Double> figurePositions;
 
-	private int maxDependencies, maxViolations, maxAll;
+	protected int maxDependencies, maxViolations, maxAll;
 
 	public NewDrawingState(String path) {
 		fullPath = path;
@@ -232,5 +232,33 @@ public class NewDrawingState {
 
 	public int getMaxAll() {
 		return maxAll;
+	}
+
+	public NewDrawingState recreateState() {
+		NewDrawingState copy = new NewDrawingState(fullPath);
+		copy.setParentState(getParentState());
+		for(String key : paths.keySet()){
+			NewFigureMap oldMap = paths.get(key);
+			copy.addPath(key);
+			copy.recreateMap(key, oldMap);
+		}
+		for(String key : contextPaths.keySet()){
+			NewFigureMap oldMap = contextPaths.get(key);
+			copy.addPath(key);
+			copy.recreateMap(key, oldMap);
+		}
+		// No need to copy over the dependency and violation entities
+		// These are fetched from the service on drawing 
+		return copy;
+	}
+	
+	
+	private void recreateMap(String path, NewFigureMap oldMap){
+		FigureFactory factory = new FigureFactory();
+		for(AbstractDTO dto : oldMap.figureDTOMap.values()){
+			// New figures are created, because you can't reuse JHotDraw figures.
+			BaseFigure newFigure = factory.createFigure(dto);
+			addFigure(path, newFigure, dto);
+		}
 	}
 }

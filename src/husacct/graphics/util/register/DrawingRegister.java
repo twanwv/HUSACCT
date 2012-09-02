@@ -32,6 +32,7 @@ public class DrawingRegister {
 	public void setPreviousAsCurrentState() {
 		if (hasPreviousAsCurrentState()) {
 			currentState = currentState.getParentState();
+			currentState = currentState.recreateState();
 		} else {
 			System.out.print(false);
 		}
