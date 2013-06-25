@@ -2,6 +2,7 @@ package husacct.define.presentation.jdialog;
 
 import husacct.ServiceProvider;
 import husacct.common.Resource;
+import husacct.common.help.presentation.HelpableJDialog;
 import husacct.control.ControlServiceImpl;
 import husacct.control.ILocaleChangeListener;
 import husacct.define.domain.services.DomainGateway;
@@ -20,13 +21,12 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class AddModuleValuesJDialog extends JDialog implements KeyListener, ActionListener, ILocaleChangeListener {
+public class AddModuleValuesJDialog extends HelpableJDialog implements KeyListener, ActionListener, ILocaleChangeListener {
 
 	private static final long serialVersionUID = -1729066215610611394L;
 	
@@ -113,12 +113,11 @@ public class AddModuleValuesJDialog extends JDialog implements KeyListener, Acti
 	private void addModuleTypeComboBox() {
 		JLabel moduleTypeLabel = new JLabel(ServiceProvider.getInstance().getLocaleService().getTranslatedString("ModuleType"));
 		this.innerPanel.add(moduleTypeLabel);
-		
-		String[] moduleTypes = {ServiceProvider.getInstance().getLocaleService().getTranslatedString("SubSystem"),
+		String[] translatedModuleTypes = {ServiceProvider.getInstance().getLocaleService().getTranslatedString("SubSystem"),
 				ServiceProvider.getInstance().getLocaleService().getTranslatedString("Layer"), 
 				ServiceProvider.getInstance().getLocaleService().getTranslatedString("Component"), 
 				ServiceProvider.getInstance().getLocaleService().getTranslatedString("ExternalLibrary")};
-		this.moduleTypeComboBox = new JComboBox<>(moduleTypes);
+		this.moduleTypeComboBox = new JComboBox<>(translatedModuleTypes);
 		this.moduleTypeComboBox.setSelectedIndex(0);
 		this.moduleTypeComboBox.addActionListener(this);
 		this.moduleTypeComboBox.addKeyListener(this);
@@ -195,7 +194,9 @@ public class AddModuleValuesJDialog extends JDialog implements KeyListener, Acti
 	}
 
 	protected void saveButtonAction() {
-		String moduleType = this.moduleTypeComboBox.getSelectedItem().toString();
+		int location = this.moduleTypeComboBox.getSelectedIndex();
+		String[] moduleTypes = { "SubSystem", "Layer", "Component", "ExternalLibrary" };
+		String moduleType = moduleTypes[location];
 		this.submitForModuleType(moduleType);
 	}
 	
@@ -206,6 +207,8 @@ public class AddModuleValuesJDialog extends JDialog implements KeyListener, Acti
 			
 			boolean hasBeenAdded = DomainGateway.getInstance().addModule(moduleName, moduleDescription, moduleType);
 			if (hasBeenAdded){
+			
+				
 				this.modulePanel.updateModuleTree();
 				this.dispose();
 			}
@@ -231,5 +234,6 @@ public class AddModuleValuesJDialog extends JDialog implements KeyListener, Acti
 		this.setTitle(ServiceProvider.getInstance().getLocaleService().getTranslatedString("NewModule"));
 	}
 	
-
+	
+	
 }
